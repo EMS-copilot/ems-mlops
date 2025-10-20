@@ -1,0 +1,32 @@
+{
+    "patient": {
+        "id": "p12345",
+        "age": 55,
+        "sex": "M",
+        "triage_level": 3,
+        "symptom": "흉통",
+        "bp_systolic": 120,
+        "hr": 90
+    },
+    "candidate_hospitals": [
+        {
+            "hospital_id": "chh-001",
+            "hospital_capacity": 45,
+            "icu_beds": 3,
+            "er_beds": 10,
+            "distance_km": 12.3,
+            "eta_minutes": 20
+        },
+        {
+            "hospital_id": "chh-002",
+            "hospital_capacity": 65,
+            "icu_beds": 0,
+            "er_beds": 8,
+            "distance_km": 8.7,
+            "eta_minutes": 12
+        }
+    ],
+    "result_method": {
+        "topK": 5
+    }
+}
