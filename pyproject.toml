@@ -1,12 +1,21 @@
 [project]
 name = "ems-wrapper"
-version = "0.2.0"
+version = "0.3.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.7,<3.10"
 dependencies = [
-    "fastapi>=0.119.1",
-    "joblib>=1.5.2",
-    "pandas>=2.3.3",
-    "tensorflow>=2.20.0",
+    "tensorflow==2.8.0",
+    "tensorflow-addons==0.16.1",
+    "protobuf<=3.20.3",
+    "numpy<=1.21.6",
+    "fastapi>=0.103.2",
+    "uvicorn>=0.22.0",
+    "gunicorn>=23.0.0",
+    "tensorflow-transform>=1.8.0",
+    "tensorflow-serving-api>=2.8.0",
+    "struct2tensor>=0.39.0",
 ]
+
+[tool.uvicorn.reload]
+exclude = ["test/**"]
