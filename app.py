@@ -1,51 +1,71 @@
 import os
-from flask import Flask, request, abort, jsonify
+from fastapi import FastAPI, Request, status, HTTPException
+from pydantic import BaseModel
+from typing import List, Any, Dict
+from contextlib import asynccontextmanager
+
 from predictor import CustomPredictor 
 
 MODEL_DIR = os.environ.get("AIP_MODEL_DIR", ".") 
 
-predictor = None 
+# ----------------------------------------------------
+# 1. Pydantic을 이용한 요청 데이터 구조 정의
+# ----------------------------------------------------
 
-def create_app():
-    """Flask 애플리케이션 팩토리"""
-    global predictor
-    app = Flask(__name__)
-    
+# class InstanceItem(BaseModel):
+#     feature_A: float
+#     feature_B: float
+
+# class PredictRequest(BaseModel):
+#     instances: List[InstanceItem]
+
+# ----------------------------------------------------
+# 2. FastAPI 애플리케이션 초기화
+# ----------------------------------------------------
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    애플리케이션 시작 시 한 번만 모델을 로드합니다.
+    """
+    try:
+        app.state.predictor = CustomPredictor(MODEL_DIR)
+        print("FastAPI: Predictor initialized successfully.")
+    except Exception as e:
+        print(f"FastAPI: Error initializing predictor: {e}")
+        raise RuntimeError("Model loading failed.")
+    yield
+
+app = FastAPI(
+    title="Custom TF Predictor with FastAPI",
+    version="1.0",
+    lifespan=lifespan
+)
+
+@app.get("/ping", status_code=status.HTTP_200_OK)
+def ping():
+    """
+    Vertex AI 헬스 체크 엔드포인트
+    """
+    return {"status": "ready"}
+
+@app.post("/predict")
+async def predict_endpoint(request: Request, request_data: PredictRequest):
+    """
+    추론 엔드포인트
+    Pydantic이 자동으로 유효성 검사를 수행합니다.
+    """
+    predictor = request.app.state.predictor
     if predictor is None:
-        try:
-            predictor = CustomPredictor(MODEL_DIR)
-            predictor.load(MODEL_DIR)
-        except Exception as e:
-            print(f"Error initializing predictor: {e}")
-            # 서버 시작 실패 시 오류 반환
-            abort(500, description="Model Initialization Failed")
+        raise HTTPException(status_code=503, detail="Service Unavailable: Model not loaded.")
 
-    @app.route("/ping", methods=["GET"])
-    def ping():
-        """헬스 체크 (컨테이너가 정상 작동 중인지 확인)"""
-        return jsonify({"status": "ready"}), 200
-
-    @app.route("/predict", methods=["POST"])
-    def predict():
-        """추론 엔드포인트"""
-        if not request.json or 'instances' not in request.json:
-            abort(400, description="Invalid request format")
-
-        try:
-            instances = request.json['instances']
-            predictions = predictor.predict(instances)
-            return jsonify({"predictions": predictions})
-
-        except Exception as e:
-            print(f"Prediction execution failed: {e}")
-            return jsonify({"error": str(e)}), 500
-
-    return app
-
-if __name__ == "__main__":
-    # 로컬 테스트용
-    app = create_app()
-    app.run(host="0.0.0.0", port=8080)
-else:
-    # Gunicorn 배포용
-    gunicorn_app = create_app()
+    try:
+        raw_instances = [item.dict() for item in request_data.instances]
+        
+        predictions = predictor.predict(raw_instances)
+        
+        return {"predictions": predictions}
+        
+    except Exception as e:
+        print(f"Prediction execution failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
