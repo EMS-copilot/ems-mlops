@@ -12,8 +12,6 @@ dependencies = [
     "fastapi>=0.103.2",
     "uvicorn>=0.22.0",
     "gunicorn>=23.0.0",
-    "tensorflow-transform>=1.8.0",
-    "tensorflow-serving-api>=2.8.0",
     "struct2tensor>=0.39.0",
 ]
 
