@@ -19,10 +19,23 @@ class CustomPredictor():
         infer = self._static.model.signatures["serving_default"]
         input_df = pd.DataFrame(instances)
         logging.info(f"Input DataFrame for prediction: {input_df}")
-        input_tensors = {
-            name: tf.constant(input_df[name].values, dtype=tf.string if input_df[name].dtype == 'object' else tf.float32)
-            for name in input_df.columns
-        }
+        INPUT_FEATURES = [
+            'age', 'sex', 'triage_level', 'symptom', 'bp_systolic', 'hr', 'icu_beds', 
+            'er_beds', 'specialist_oncall', 'hospital_capacity', 'hospital_area', 
+            'is_24h', 'is_regional_center', 'has_er', 'distance_km', 'eta_minutes'
+        ]
+        input_tensors = {}
+        for feature in INPUT_FEATURES:
+                if feature not in input_df.columns:
+                    print(f"error missing '{feature}'")
+                    continue
+                    
+                series = input_df[feature]
+                
+                tensor = tf.constant(series.values.astype(str), dtype=tf.string)
+                input_tensors[feature] = tensor
+
+                
         logging.info(f"Input tensors for model inference: {input_tensors}")
         predictions = infer(**input_tensors)
         return predictions
