@@ -1,37 +1,18 @@
-# -*- coding: utf-8 -*-
-
-# Copyright 2022 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-import joblib
-import numpy as np
 import os
-import pickle
+import json
+import numpy as np
+import tensorflow as tf
+from typing import List, Any, Dict
 
-from google.cloud.aiplatform.constants import prediction
-from google.cloud.aiplatform.utils import prediction_utils
-from google.cloud.aiplatform.prediction.predictor import Predictor
-
-
-class SklearnPredictor(Predictor):
+class CustomPredictor():
     """Default Predictor implementation for Sklearn models."""
 
     def __init__(self):
+        self._static = None
+        self._batch = None
         return
 
-    def load(self, artifacts_uri: str) -> None:
+    def load(self, model_dir: str) -> None:
         """Loads the model artifact.
 
         Args:
@@ -42,29 +23,15 @@ class SklearnPredictor(Predictor):
             ValueError: If there's no required model files provided in the artifacts
                 uri.
         """
-        prediction_utils.download_model_artifacts(artifacts_uri)
-        if os.path.exists(prediction.MODEL_FILENAME_JOBLIB):
-            self._model = joblib.load(prediction.MODEL_FILENAME_JOBLIB)
-        elif os.path.exists(prediction.MODEL_FILENAME_PKL):
-            self._model = pickle.load(open(prediction.MODEL_FILENAME_PKL, "rb"))
-        else:
-            valid_filenames = [
-                prediction.MODEL_FILENAME_JOBLIB,
-                prediction.MODEL_FILENAME_PKL,
-            ]
-            raise ValueError(
-                f"One of the following model files must be provided: {valid_filenames}."
-            )
+        
+        from codes import StaticResource, BatchInfo
+        self._static = StaticResource(model_dir)
+        self._batch = BatchInfo([])
 
     def preprocess(self, prediction_input: dict) -> np.ndarray:
-        """Converts the request body to a numpy array before prediction.
-        Args:
-            prediction_input (dict):
-                Required. The prediction input that needs to be preprocessed.
-        Returns:
-            The preprocessed prediction input.
-        """
-        instances = prediction_input["instances"]
+        from codes.preprocess import custom_preprocess
+
+        instances, self._batch.index = custom_preprocess(prediction_input, self._static.hospital_meta)
         return np.asarray(instances)
 
     def predict(self, instances: np.ndarray) -> np.ndarray:
