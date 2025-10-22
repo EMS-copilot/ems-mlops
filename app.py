@@ -11,7 +11,7 @@ if os.environ.get("TEST_ENV", ".") == 'true':
     META_DIR = os.environ.get("LOCAL_META_DIR", ".")
 else: 
     MODEL_DIR = os.environ.get("AIP_MODEL_DIR", ".") 
-    MODEL_DIR = os.environ.get("AIP_META_DIR", ".") 
+    META_DIR = os.environ.get("AIP_META_DIR", ".") 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
         print("FastAPI: Predictor initialized successfully.")
     except Exception as e:
         print(f"FastAPI: Error initializing predictor: {e}")
-        raise RuntimeError("Model loading failed.")
+        raise RuntimeError("Model loading failed.")        
     yield
 
 app = FastAPI(
@@ -31,6 +31,7 @@ app = FastAPI(
 
 @app.get("/ping", status_code=status.HTTP_200_OK)
 def ping():
+    print('called ping')
     return {"status": "ready"}
 
 @app.post("/predict")
@@ -54,7 +55,7 @@ async def predict_endpoint(request: Request, request_data: InputSchema):
 @app.post("/test_preprocess", status_code=status.HTTP_200_OK)
 def test_input_preprocess(request: Request, input_data: InputSchema):
     try:
-        instances = request.app.state.predictor.preprocess(input_data)
+        instances = request.app.state.predictor.preprocess(input_data.model_dump())
     except Exception as e:
         print(f"Preprocessing failed: {e}")
         raise HTTPException(

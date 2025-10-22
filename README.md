@@ -4,9 +4,8 @@
 - 추론에 대한 preprocess, postprocess를 위한 래퍼
 
 ## 기술 스택
-- Google Cloud
-    - Cloud Storage
-    - Vertex AI
-        - Custom Predictor Routine
-- Docker
-- Python
+- Cloud: Google Cloud (Vertex AI, Cloud Storage)
+- Backend: FastAPI
+- Machine Learning: TensorFlow
+- Container: Docker
+- Dev Environment: uv
