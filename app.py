@@ -2,18 +2,21 @@ import os
 from fastapi import FastAPI, Request, status, HTTPException
 from contextlib import asynccontextmanager
 
-from predictor import CustomPredictor 
-from schemas import InputSchema
+from codes.predictor import CustomPredictor 
+from codes.schemas import InputSchema
 
-MODEL_DIR = os.environ.get("AIP_MODEL_DIR", ".") 
+if os.environ.get("TEST_ENV", ".") == 'true': 
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    MODEL_DIR = os.environ.get("LOCAL_MODEL_DIR", ".")
+    META_DIR = os.environ.get("LOCAL_META_DIR", ".")
+else: 
+    MODEL_DIR = os.environ.get("AIP_MODEL_DIR", ".") 
+    MODEL_DIR = os.environ.get("AIP_META_DIR", ".") 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    애플리케이션 시작 시 한 번만 모델을 로드합니다.
-    """
     try:
-        #app.state.predictor = CustomPredictor(MODEL_DIR)
+        app.state.predictor = CustomPredictor(MODEL_DIR, META_DIR)
         print("FastAPI: Predictor initialized successfully.")
     except Exception as e:
         print(f"FastAPI: Error initializing predictor: {e}")
@@ -29,13 +32,6 @@ app = FastAPI(
 @app.get("/ping", status_code=status.HTTP_200_OK)
 def ping():
     return {"status": "ready"}
-
-@app.post("/test_input", status_code=status.HTTP_200_OK)
-def test_input(input_data: InputSchema):
-    """
-    입력 스키마의 유효성을 검사하기 위한 테스트 엔드포인트입니다.
-    """
-    return {"status": "success", "message": "Input data is valid."}
 
 @app.post("/predict")
 async def predict_endpoint(request: Request, request_data: InputSchema):
@@ -53,3 +49,16 @@ async def predict_endpoint(request: Request, request_data: InputSchema):
     except Exception as e:
         print(f"Prediction execution failed: {e}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+    
+
+@app.post("/test_preprocess", status_code=status.HTTP_200_OK)
+def test_input_preprocess(request: Request, input_data: InputSchema):
+    try:
+        instances = request.app.state.predictor.preprocess(input_data)
+    except Exception as e:
+        print(f"Preprocessing failed: {e}")
+        raise HTTPException(
+            status_code=400,  
+            detail=f"Invalid input: {str(e)}"
+        )
+    return {"status": "success", "message": "Input data is valid.", "instances":instances}
