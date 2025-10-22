@@ -6,7 +6,7 @@ from typing import List, Any, Dict
 class CustomPredictor():
     """Default Predictor implementation for Sklearn models."""
 
-    def __init__(self, model_dir: str, meta_dir:str) -> None:
+    def __init__(self, model_dir: str, meta_dir:str = None) -> None:
         from codes import StaticResource, BatchInfo
         self._static = StaticResource(model_dir, meta_dir)
         self._batch = BatchInfo([])

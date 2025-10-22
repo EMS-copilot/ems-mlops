@@ -3,7 +3,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any
-@dataclass(slots=True, frozen=True)
+
+
+@dataclass(frozen=True)
 class StaticResource:
     model:Any
     hospital_meta: Mapping[str, dict]

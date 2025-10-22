@@ -1,3 +1,4 @@
+
 def preprocess_request_json(data:dict, hospital_meta:dict) -> dict:
     patient_info = {k: v for k, v in data["patient"].items()}
 

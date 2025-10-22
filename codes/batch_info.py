@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-@dataclass(slots=True)
+@dataclass()
 class BatchInfo:
     index: List[str]
