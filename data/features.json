@@ -1,0 +1,16 @@
+[
+  "age",
+  "sex",
+  "triage_level",
+  "symptom",
+  "bp_systolic",
+  "icu_beds",
+  "er_beds",
+  "specialist_oncall",
+  "hospital_capacity",
+  "hospital_area",
+  "is_24h",
+  "has_er",
+  "distance_km",
+  "eta_minutes"
+]

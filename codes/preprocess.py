@@ -1,63 +1,79 @@
+from typing import List, Dict
 
-import logging
+import tensorflow as tf
 
-def _convert_types(data: dict) -> dict:
+
+def custom_preprocess(
+    data: Dict, feature: Dict = None, hospital_meta: Dict = None
+) -> tf.Tensor:
+    batch = to_batch(data, feature, hospital_meta)
+    example_batch = [to_tf_example(i).SerializeToString() for i in batch]
+    input_tensors = tf.constant(example_batch, dtype=tf.string)
+    return input_tensors
+
+
+def _feature(data: str):
+    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[data.encode("utf-8")]))
+
+
+def _convert_types(data: Dict) -> Dict:
     converted_data = data.copy()
-    
-    # Convert all values to string type
+
     for key, value in converted_data.items():
         if value is not None:
             converted_data[key] = str(value)
         else:
-            converted_data[key] = None # Keep None if it's None
+            converted_data[key] = None
 
     return converted_data
 
-def preprocess_request_json(data:dict, hospital_meta:dict) -> dict:
+
+def parse_batch_info(data: Dict) -> Dict:
+    index = [i["hospital_id"] for i in data["candidate_hospitals"]]
+    method = data["result_method"]
+    return index, method
+
+
+def to_batch(data: Dict, feature: List, hospital_meta: Dict) -> Dict:
     patient_info = {k: v for k, v in data["patient"].items()}
-    patient_info = _convert_types(patient_info) # Apply type conversion
+    patient_info = _convert_types(patient_info)  # Apply type conversion
 
-    TARGET_SCHEMA_KEYS = [
-        "age", "sex", "triage_level", "symptom", "bp_systolic", "hr", 
-        "icu_beds", "er_beds", "specialist_oncall", "hospital_capacity", 
-        "hospital_area", "is_24h", "is_regional_center", "has_er", 
-        "distance_km", "eta_minutes"
-    ]
-
-    result = []
-    hospital_ids = []
+    batch = []
     for hospital in data["candidate_hospitals"]:
         hid = hospital["hospital_id"]
-        hospital_ids.append(hid)
         hospital_info = {k: v for k, v in hospital.items() if k != "hospital_id"}
-        hospital_info = _convert_types(hospital_info) # Apply type conversion
+        hospital_info["specialist_oncall"] = "0.0"
+        hospital_info = _convert_types(hospital_info)
         meta_info = hospital_meta.get(hid, {})
-        meta_info = _convert_types(meta_info) # Apply type conversion
-        
-        combined_info = {
-            **patient_info,
-            **hospital_info,
-            **meta_info
-        }
-        
-        # Filter combined_info to only include keys from TARGET_SCHEMA_KEYS
-        filtered_instance = {key: combined_info.get(key) for key in TARGET_SCHEMA_KEYS}
-        filtered_instance['triage_level'] = 'Level'+filtered_instance['triage_level']
-        result.append(filtered_instance)
+        meta_info = _convert_types(meta_info)
 
-    return result, hospital_ids
+        combined_info = {**patient_info, **hospital_info, **meta_info}
+
+        filtered_instance = {key: combined_info.get(key) for key in feature}
+        filtered_instance["triage_level"] = "Level" + filtered_instance["triage_level"]
+        batch.append(filtered_instance)
+    return batch
 
 
-def custom_preprocess(data, meta):
-    data, ids = preprocess_request_json(data, meta)
-    return data, ids
+def to_tf_example(data: Dict):
+    example = tf.train.Example(
+        features=tf.train.Features(feature={k: _feature(v) for k, v in data.items()})
+    )
+    return example
 
 
 if __name__ == "__main__":
     import json
-    from codes.static_resource import load_hospital_meta
     
-    with open("test/input_api_schema.json", 'r') as f:
+    from codes.static_resources import load_hospital_meta, load_features
+
+    with open("data/input_api_schema.json", "r") as f:
         data = json.load(f)
 
-    logging.info(custom_preprocess(data, load_hospital_meta()))
+    print(
+        custom_preprocess(
+            data,
+            load_features("data/features.json"),
+            load_hospital_meta("data/hospital_meta.csv"),
+        )
+    )
