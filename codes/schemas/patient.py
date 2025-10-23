@@ -4,7 +4,7 @@ from .utils import Coord
 
 
 class Patient(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra="ignore")
 
     id: str
     age: Annotated[int, Field(ge=0, le=120)]
@@ -30,6 +30,7 @@ class Patient(BaseModel):
                 f"triage_level={self.triage_level}는 {allowed} 중 하나여야 함 (지금: {self.symptom})"
             )
         return self
-    
+
+
 class PatientWithLocation(Patient):
-        location: Coord
+    location: Coord

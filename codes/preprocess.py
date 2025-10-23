@@ -1,5 +1,4 @@
 from typing import List, Dict
-
 import tensorflow as tf
 
 
@@ -26,12 +25,6 @@ def _convert_types(data: Dict) -> Dict:
             converted_data[key] = None
 
     return converted_data
-
-
-def parse_batch_info(data: Dict) -> Dict:
-    index = [i["hospital_id"] for i in data["candidate_hospitals"]]
-    method = data["result_method"]
-    return index, method
 
 
 def to_batch(data: Dict, feature: List, hospital_meta: Dict) -> Dict:
@@ -64,7 +57,7 @@ def to_tf_example(data: Dict):
 
 if __name__ == "__main__":
     import json
-    
+
     from codes.static_resources import load_hospital_meta, load_features
 
     with open("data/input_api_schema.json", "r") as f:

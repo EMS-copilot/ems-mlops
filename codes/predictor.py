@@ -1,4 +1,4 @@
-import pandas as pd
+import os
 from typing import List, Dict
 import logging
 
@@ -6,15 +6,14 @@ import logging
 class CustomPredictor:
     def __init__(
         self,
-        feature_dir: str = "data/features.json",
-        meta_dir: str = "data/hospital_meta.csv",
+        feature_dir: str = os.environ.get("LOCAL_FEATURE_DIR"),
+        meta_dir: str = os.environ.get("LOCAL_META_DIR"),
     ) -> None:
-        from codes import StaticResources
+        from codes import StaticResources, BatchInfo
 
         self._infer = None
         self._static = StaticResources(feature_dir, meta_dir)
-        self.index = []
-        self.method = {}
+        self._batch_info = BatchInfo()
 
     def load_model(self, model_path):
         from codes import load_infer
@@ -22,32 +21,38 @@ class CustomPredictor:
         self._infer = load_infer(model_path)
 
     def preprocess(self, input_json: Dict) -> List:
-        from codes import custom_preprocess, parse_batch_info
+        from codes import custom_preprocess
 
-        self.index, self.method = parse_batch_info(input_json)
+        self._batch_info.update(input_json)
         instances = custom_preprocess(
             input_json, self._static.features, self._static.hospital_meta
         )
         return instances
 
-    def predict(self, input: Dict):
-        input_tensors = self.preprocess(input)
-        logging.debug(f"Input tensors for model inference: {input_tensors}")
+    def predict(self, input: Dict) -> Dict:             # input_api_schema 
+        input_tensors = self.preprocess(input)          # tf.Tensor
+        logging.debug(f"input_tensors: {input_tensors}")
 
-        predictions = self._infer(inputs=input_tensors)
-        logging.info(f"result for model inference: {predictions}")
+        predictions = self._infer(inputs=input_tensors) # {'outputs':tf.Tensor}
+        logging.info(f"predictions: {predictions}")
 
-        return predictions
+        results = self.postprocess(predictions)         # output_api_schema
+        logging.info(f"results: {results}")
 
-    def postprocess(self, prediction_results) -> Dict:
-        return {"predictions": prediction_results.tolist()}
+        return results
 
-if __name__ == '__main__':
+    def postprocess(self, data) -> Dict:
+        from codes import custom_postprocess
+
+        return custom_postprocess(data, self._batch_info)
+
+
+if __name__ == "__main__":
     import json
 
-    with open("data/input_api_schema.json", "r") as f:    
+    with open(os.environ.get("LOCAL_INPUT_SCHEMA"), "r") as f:
         data = json.load(f)
-    
+
     predictor = CustomPredictor()
-    predictor.load_model('./local_model_assets/predict/001/')
-    print(predictor.predict(data))
+    predictor.load_model(os.environ.get("LOCAL_MODEL_DIR"))
+    predictor.predict(data)
