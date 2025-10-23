@@ -1,45 +1,53 @@
-import tensorflow as tf
 import pandas as pd
-from typing import List, Any, Dict
+from typing import List, Dict
+import logging
 
-class CustomPredictor():
-    def __init__(self, model_dir: str, meta_dir:str = None) -> None:
-        from codes import StaticResource, BatchInfo
-        self._static = StaticResource(model_dir, meta_dir)
-        self._batch = BatchInfo([])
 
-    def preprocess(self, prediction_input: dict) -> list:
-        from codes.preprocess import custom_preprocess
+class CustomPredictor:
+    def __init__(
+        self,
+        feature_dir: str = "data/features.json",
+        meta_dir: str = "data/hospital_meta.csv",
+    ) -> None:
+        from codes import StaticResources
 
-        instances, self._batch.index = custom_preprocess(prediction_input, self._static.hospital_meta)
+        self._infer = None
+        self._static = StaticResources(feature_dir, meta_dir)
+        self.index = []
+        self.method = {}
+
+    def load_model(self, model_path):
+        from codes import load_infer
+
+        self._infer = load_infer(model_path)
+
+    def preprocess(self, input_json: Dict) -> List:
+        from codes import custom_preprocess, parse_batch_info
+
+        self.index, self.method = parse_batch_info(input_json)
+        instances = custom_preprocess(
+            input_json, self._static.features, self._static.hospital_meta
+        )
         return instances
 
-    def predict(self, instances:list):
-        import logging
-        infer = self._static.model.signatures["serving_default"]
-        input_df = pd.DataFrame(instances)
-        logging.info(f"Input DataFrame for prediction: {input_df}")
-        INPUT_FEATURES = [
-            'age', 'sex', 'triage_level', 'symptom', 'bp_systolic', 'hr', 'icu_beds', 
-            'er_beds', 'specialist_oncall', 'hospital_capacity', 'hospital_area', 
-            'is_24h', 'is_regional_center', 'has_er', 'distance_km', 'eta_minutes'
-        ]
-        input_tensors = {}
-        for feature in INPUT_FEATURES:
-                if feature not in input_df.columns:
-                    print(f"error missing '{feature}'")
-                    continue
-                    
-                series = input_df[feature]
-                
-                tensor = tf.constant(series.values.astype(str), dtype=tf.string)
-                input_tensors[feature] = tensor
+    def predict(self, input: Dict):
+        input_tensors = self.preprocess(input)
+        logging.debug(f"Input tensors for model inference: {input_tensors}")
 
-                
-        logging.info(f"Input tensors for model inference: {input_tensors}")
-        predictions = infer(**input_tensors)
+        predictions = self._infer(inputs=input_tensors)
+        logging.info(f"result for model inference: {predictions}")
+
         return predictions
 
-    def postprocess(self, prediction_results) -> dict:
-
+    def postprocess(self, prediction_results) -> Dict:
         return {"predictions": prediction_results.tolist()}
+
+if __name__ == '__main__':
+    import json
+
+    with open("data/input_api_schema.json", "r") as f:    
+        data = json.load(f)
+    
+    predictor = CustomPredictor()
+    predictor.load_model('./local_model_assets/predict/001/')
+    print(predictor.predict(data))
