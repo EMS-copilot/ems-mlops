@@ -12,6 +12,7 @@ setup_logging()
 if os.environ.get("TEST_ENV", ".") == 'true': 
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     MODEL_DIR = os.environ.get("LOCAL_MODEL_DIR", ".")
+    FEATURE_DIR = os.environ.get("LOCAL_FEATURE_DIR", ".")
     META_DIR = os.environ.get("LOCAL_META_DIR", ".")
     logging.info("App startup: Running in TEST_ENV mode: Using local model and meta directories.")
 else: 
@@ -22,7 +23,8 @@ else:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        app.state.predictor = CustomPredictor(MODEL_DIR, META_DIR)
+        app.state.predictor = CustomPredictor(FEATURE_DIR, META_DIR)
+        app.state.predictor.load_model(MODEL_DIR)
         logging.info("App startup: Predictor initialized successfully.")
     except Exception as e:
         logging.error(f"App startup: Error initializing predictor: {e}")
@@ -46,8 +48,7 @@ async def predict_endpoint(request: Request, request_data: InputSchema):
         raise HTTPException(status_code=503, detail="Service Unavailable: Model not loaded.")
 
     try:
-        instances = predictor.preprocess(request_data.model_dump())        
-        predictions = predictor.predict(instances)
+        predictions = predictor.predict(request_data.model_dump())
         
         return {"predictions": predictions}
         

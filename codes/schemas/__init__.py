@@ -1,6 +1,6 @@
 from .patient import Patient
 from .hospital import Hospital
-from .input_schema import InputSchema
+from .api_schema import InputSchema, OutputSchema
 
 from pydantic import BaseModel
 from typing import List
