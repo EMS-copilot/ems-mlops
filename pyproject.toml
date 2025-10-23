@@ -18,3 +18,10 @@ dependencies = [
 
 [tool.uvicorn.reload]
 exclude = ["test/**"]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.16.2",
+    "notebook>=6.5.7",
+    "ruff>=0.14.1",
+]
