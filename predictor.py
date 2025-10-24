@@ -18,7 +18,7 @@ class CustomPredictor:
         self._model: Any = None
         self._input_key: str = None
         self._static = StaticResources(
-            os.environ.get("GCS_FEATURE_URI"), os.environ.get("GCS_META_URI")
+            os.getenv("AIP_FEATURE_DIR"), os.getenv("AIP_META_DIR")
         )
         self._batch_info = BatchInfo()
         logging.info("Static resources initialized.")
@@ -79,9 +79,9 @@ class CustomPredictor:
 if __name__ == "__main__":
     import json
 
-    with open(os.environ.get("LOCAL_INPUT_SCHEMA"), "r") as f:
+    with open(os.getenv("LOCAL_INPUT_SCHEMA"), "r") as f:
         data = json.load(f)
 
     predictor = CustomPredictor()
-    predictor.load(os.environ.get("AIP_MODEL_DIR"))
-    predictor.predict(data)
+    predictor.load(os.getenv("AIP_MODEL_DIR"))
+    print(predictor.predict(data))

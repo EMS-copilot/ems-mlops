@@ -1,0 +1,1 @@
+from deploy.local_model import get_local_model
