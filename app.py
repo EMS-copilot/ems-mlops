@@ -55,16 +55,3 @@ async def predict_endpoint(request: Request, request_data: InputSchema):
     except Exception as e:
         logging.error(f"Predict endpoint: Prediction execution failed: {e}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
-    
-
-@app.post("/test_preprocess", status_code=status.HTTP_200_OK)
-def test_input_preprocess(request: Request, request_data: InputSchema):
-    try:
-        instances = request.app.state.predictor.preprocess(request_data.model_dump())
-    except Exception as e:
-        logging.error(f"Test Preprocess endpoint: Preprocessing failed: {e}")
-        raise HTTPException(
-            status_code=400,  
-            detail=f"Invalid input: {str(e)}"
-        )
-    return {"status": "success", "message": "Input data is valid.", "instances":instances}

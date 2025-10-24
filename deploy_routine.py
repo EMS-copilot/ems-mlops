@@ -4,38 +4,50 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-PROJECT_ID = "white-sunspot-473307-p3"  
-REGION = "asia-northeast3"               
-AR_REPO_NAME = "ems-copilot-docker"           
-MODEL_DISPLAY_NAME = "ems-wraper-routine"
-ENDPOINT_DISPLAY_NAME = "ems-wrapper-routine-endpoint"
+PROJECT_ID = "white-sunspot-473307-p3"
+REGION = "asia-northeast3"
+AR_REPO_NAME = "ems-copilot-docker"
+MODEL_DISPLAY_NAME = "ems-wraper-routine-1"
+ENDPOINT_DISPLAY_NAME = "ems-wrapper-routine-endpoint-1"
 
-GCS_FEATURE_URI = "gs://ems_dummy_1/data/features.json" 
-GCS_META_URI = "gs://ems_dummy_1/data/hospital_meta.csv"        
+GCS_FEATURE_URI = "gs://ems_dummy_1/data/features.json"
+GCS_META_URI = "gs://ems_dummy_1/data/hospital_meta.csv"
 
-MODEL_ARTIFACT_URI = "gs://ems_dummy_1/model/model-8766129131327848448/tf-saved-model/2025-10-22T00:15:58.603467Z/predict/001/" 
+MODEL_ARTIFACT_URI = "gs://ems_dummy_1/model/model-8766129131327848448/tf-saved-model/2025-10-22T00:15:58.603467Z/predict/001/"
 
 IMAGE_URI = f"{REGION}-docker.pkg.dev/{PROJECT_ID}/{AR_REPO_NAME}/tf-cpr-service:latest"
+STAGING_BUCKET_URI = f"gs://{PROJECT_ID}-vertex-staging"
 
+ENV_VARS_DICT = {
+    "GCS_FEATURE_URI": GCS_FEATURE_URI,
+    "GCS_META_URI": GCS_META_URI,
+}
+
+# ====================================================================
+# Init Vertex AI
+# ====================================================================
 aiplatform.init(project=PROJECT_ID, location=REGION)
 
-
 try:
-    from predictor import CustomPredictor 
+    from predictor import CustomPredictor
 except ImportError:
-    logging.error("Failed to import CustomPredictor. Ensure predictor.py is accessible.")
+    logging.error(
+        "Failed to import CustomPredictor. Ensure predictor.py is accessible."
+    )
     exit(1)
 
 
+# ====================================================================
+# Build and Push CPR Image
+# ====================================================================
 logging.info(f"Building CPR image: {IMAGE_URI}")
-
 local_model = LocalModel.build_cpr_model(
-    staging_bucket=f"gs://{PROJECT_ID}-vertex-staging",  
-    image_uri=IMAGE_URI,
+    src_dir=".",
+    output_image_uri=IMAGE_URI,
     predictor=CustomPredictor,
-    requirements_path="./requirements-routine.txt",  
+    requirements_path="./requirements-routine.txt",
+    base_image="python:3.9",
 )
-
 logging.info("Image successfully built locally.")
 
 logging.info("Pushing image to Artifact Registry...")
@@ -43,33 +55,54 @@ local_model.push_image()
 logging.info("Image push successful.")
 
 
-logging.info("Uploading Model to Vertex AI Model Registry...")
+# ====================================================================
+# Upload Model
+# ====================================================================
+logging.info("Checking Model Registry for existing model...")
+model_filter = f'display_name="{MODEL_DISPLAY_NAME}"'
+existing_models = aiplatform.Model.list(filter=model_filter)
 
-model = aiplatform.Model.upload(
-    local_model=local_model,
-    display_name=MODEL_DISPLAY_NAME,
-    artifact_uri=MODEL_ARTIFACT_URI,
-)
+if existing_models:
+    model = existing_models[0]
+    logging.info(f"Existing Model found: {model.resource_name}. Reusing.")
+else:
+    logging.info("Model not found. Uploading new Model...")
+    model = aiplatform.Model.upload(
+        local_model=local_model,
+        display_name=MODEL_DISPLAY_NAME,
+        artifact_uri=MODEL_ARTIFACT_URI,
+        serving_container_environment_variables=ENV_VARS_DICT, 
+    )
+    logging.info(f"Model uploaded successfully. Resource name: {model.resource_name}")
 
-logging.info(f"Model uploaded successfully. Resource Name: {model.resource_name}")
-logging.info(f"Deploying Model to Endpoint: {ENDPOINT_DISPLAY_NAME}...")
 
-endpoint = aiplatform.Endpoint.create(
-    display_name=ENDPOINT_DISPLAY_NAME,
-)
+# # ====================================================================
+# # Deploy Model to Endpoint
+# # ====================================================================
 
-model.deploy(
-    endpoint=endpoint,
-    machine_type="n1-standard-2",  
-    min_replica_count=1,
-    max_replica_count=1,
-    
-    env_vars={
-        "GCS_FEATURE_URI": GCS_FEATURE_URI,
-        "GCS_META_URI": GCS_META_URI,
-    }
-)
+# logging.info("Checking Endpoint Registry for existing endpoint...")
+# endpoint_filter = f'display_name="{ENDPOINT_DISPLAY_NAME}"'
+# existing_endpoints = aiplatform.Endpoint.list(filter=endpoint_filter)
 
-logging.info("Deployment complete!")
-logging.info(f"Endpoint URL: {endpoint.uri}")
+# if existing_endpoints:
+#     endpoint:aiplatform.Endpoint = existing_endpoints[0]
+#     logging.info(f"Existing Endpoint found: {endpoint.resource_name}. Reusing.")
+# else:
+#     logging.info("Endpoint not found. Creating new Endpoint...")
+#     endpoint:aiplatform.Endpoint = aiplatform.Endpoint.create(
+#         display_name=ENDPOINT_DISPLAY_NAME,
+#     )
+#     logging.info(f"Endpoint created: {endpoint.uri}")
 
+
+# logging.info(
+#     f"Deploying Model {model.display_name} to Endpoint {endpoint.display_name}..."
+# )
+
+# model.deploy(
+#     endpoint=endpoint, 
+#     traffic_split={"0": 100}
+# )
+
+# logging.info("Deployment complete!")
+# logging.info(f"Endpoint URL: {endpoint.uri}")

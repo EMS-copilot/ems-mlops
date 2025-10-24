@@ -5,9 +5,9 @@ description = "ML pipelines for EMS-Copilot: development and deployment"
 readme = "README.md"
 requires-python = ">=3.7,<3.10"
 dependencies = [
-    "tensorflow==2.8.0",
-    "numpy<=1.21.6",
-    "google-cloud-aiplatform[prediction]",
+    "tensorflow-cpu==2.8.0",
+    "numpy<=1.21.6",    
+    "struct2tensor>=0.39.0",
 ]
 
 [tool.uvicorn.reload]
@@ -20,8 +20,9 @@ dev = [
 container = [
     "tensorflow-addons==0.16.1",
     "gunicorn>=23.0.0",
-    "struct2tensor>=0.39.0",
 ]
-
+routine = [
+    "google-cloud-aiplatform[prediction]",
+]
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]

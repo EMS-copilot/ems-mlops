@@ -2,6 +2,7 @@ import os
 import logging
 from typing import List, Dict, Any
 import tensorflow as tf
+import struct2tensor.ops.gen_decode_proto_sparse
 
 from codes import (
     StaticResources,
@@ -57,7 +58,7 @@ class CustomPredictor:
         return predictions  # tf.Tensor
 
     def postprocess(self, predictions) -> Dict:
-        results = custom_postprocess(predictions)
+        results = custom_postprocess(predictions, self._batch_info)
         logging.debug(f"results: {results}")
 
         return results  # output_api_schema
@@ -82,5 +83,5 @@ if __name__ == "__main__":
         data = json.load(f)
 
     predictor = CustomPredictor()
-    predictor.load_model(os.environ.get("LOCAL_MODEL_DIR"))
+    predictor.load(os.environ.get("AIP_MODEL_DIR"))
     predictor.predict(data)

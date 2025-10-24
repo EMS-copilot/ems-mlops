@@ -208,37 +208,39 @@ name = "ems-wrapper"
 version = "0.4.1"
 source = { virtual = "." }
 dependencies = [
-    { name = "google-cloud-aiplatform", version = "1.15.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
-    { name = "google-cloud-aiplatform", version = "1.90.0", source = { registry = "https://pypi.org/simple" }, extra = ["prediction"], marker = "python_full_version == '3.8.*'" },
-    { name = "google-cloud-aiplatform", version = "1.122.0", source = { registry = "https://pypi.org/simple" }, extra = ["prediction"], marker = "python_full_version >= '3.9'" },
     { name = "numpy" },
-    { name = "tensorflow" },
+    { name = "struct2tensor" },
+    { name = "tensorflow-cpu" },
 ]
 
 [package.dev-dependencies]
 container = [
     { name = "gunicorn" },
-    { name = "struct2tensor" },
     { name = "tensorflow-addons" },
 ]
 dev = [
     { name = "ruff" },
 ]
+routine = [
+    { name = "google-cloud-aiplatform", version = "1.15.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "google-cloud-aiplatform", version = "1.90.0", source = { registry = "https://pypi.org/simple" }, extra = ["prediction"], marker = "python_full_version == '3.8.*'" },
+    { name = "google-cloud-aiplatform", version = "1.122.0", source = { registry = "https://pypi.org/simple" }, extra = ["prediction"], marker = "python_full_version >= '3.9'" },
+]
 
 [package.metadata]
 requires-dist = [
-    { name = "google-cloud-aiplatform", extras = ["prediction"] },
     { name = "numpy", specifier = "<=1.21.6" },
-    { name = "tensorflow", specifier = "==2.8.0" },
+    { name = "struct2tensor", specifier = ">=0.39.0" },
+    { name = "tensorflow-cpu", specifier = "==2.8.0" },
 ]
 
 [package.metadata.requires-dev]
 container = [
     { name = "gunicorn", specifier = ">=23.0.0" },
-    { name = "struct2tensor", specifier = ">=0.39.0" },
     { name = "tensorflow-addons", specifier = "==0.16.1" },
 ]
 dev = [{ name = "ruff", specifier = ">=0.14.1" }]
+routine = [{ name = "google-cloud-aiplatform", extras = ["prediction"] }]
 
 [[package]]
 name = "exceptiongroup"
@@ -2080,6 +2082,57 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/80/63/f9ca047dbe146f2a2993b3b79da8771942b7a598ba4ce0d904d9697c6e9f/tensorflow_addons-0.16.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:0cf05e2e82b371ae67f636156fbae0be1ef2be43eb41b261977e55bfe8fd4d7b", size = 545085, upload-time = "2022-02-15T18:37:00.113Z" },
     { url = "https://files.pythonhosted.org/packages/2d/9a/c917382f0145c4c5cd0ce6643225fbd2d49a67bfce5b7a34a342d6837d4d/tensorflow_addons-0.16.1-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:23c822eaaed2d0024c6e9d8e487c472d947553d410cfbcdfb6fadcab2151d3e6", size = 1123429, upload-time = "2022-02-15T18:37:01.528Z" },
     { url = "https://files.pythonhosted.org/packages/b4/88/6c9f63e4f9053c6529a25765ae40f6de4f79f96c9a18255769c4621e8095/tensorflow_addons-0.16.1-cp39-cp39-win_amd64.whl", hash = "sha256:4af94b46814769162f306deec70aaacfa73336639f1a31ee681147c0be29396a", size = 755750, upload-time = "2022-02-15T18:37:03.967Z" },
+]
+
+[[package]]
+name = "tensorflow-cpu"
+version = "2.8.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "absl-py" },
+    { name = "astunparse" },
+    { name = "flatbuffers" },
+    { name = "gast" },
+    { name = "google-pasta" },
+    { name = "grpcio", version = "1.62.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "grpcio", version = "1.70.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "grpcio", version = "1.76.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "h5py", version = "3.8.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "h5py", version = "3.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "h5py", version = "3.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "keras" },
+    { name = "keras-preprocessing" },
+    { name = "libclang" },
+    { name = "numpy" },
+    { name = "opt-einsum", version = "3.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "opt-einsum", version = "3.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
+    { name = "protobuf" },
+    { name = "setuptools", version = "68.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "setuptools", version = "75.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "setuptools", version = "80.9.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "six" },
+    { name = "tensorboard" },
+    { name = "tensorflow-io-gcs-filesystem" },
+    { name = "termcolor", version = "2.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "termcolor", version = "2.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "termcolor", version = "3.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "tf-estimator-nightly" },
+    { name = "typing-extensions", version = "4.7.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "typing-extensions", version = "4.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "typing-extensions", version = "4.15.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "wrapt", version = "1.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "wrapt", version = "2.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/e0/2f4a8a2b8698e0488587814e52450d1ef1f96a8a77fd2154ed2a59ff5eb5/tensorflow_cpu-2.8.0-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:f7b8bac2a70b26c54d222637899120b0025110690411dd4ab270c72f5193e692", size = 217354483, upload-time = "2022-02-02T15:34:25.409Z" },
+    { url = "https://files.pythonhosted.org/packages/a2/18/e1b2713f1a57728b1cde74b671e33deaa74a69756c02e465fa15472a78d1/tensorflow_cpu-2.8.0-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:a0cf3a5dd40f056a5a4f3f7be0b616c5bdfbf850e4782f2467f9e16d4144eadb", size = 190470157, upload-time = "2022-02-02T16:00:30.3Z" },
+    { url = "https://files.pythonhosted.org/packages/de/5e/63f499dcc57261be154241525f5b449d67394394834ca4a1dbe785e8a50c/tensorflow_cpu-2.8.0-cp37-cp37m-win_amd64.whl", hash = "sha256:46cfe5fcc5d5ceb2497b8b28c54f1f6c6007b54a56a59e477e4fe1f9b70b1a8b", size = 246890553, upload-time = "2022-02-02T16:11:59.555Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/4b/da9cb180b2348359e4695739cedcf0e2c646ec9d9b64c4001301ae3341c1/tensorflow_cpu-2.8.0-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:73f64ce835a4ba38587b8bdb5d41428d99b8321a3e93d00677ed6941d5e753b5", size = 217436936, upload-time = "2022-02-02T15:34:46.282Z" },
+    { url = "https://files.pythonhosted.org/packages/42/11/5867240eaabf64beffeaacfcde9b53323640e2fff444e7969fa7ec5f4dcb/tensorflow_cpu-2.8.0-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:1e6bc4036d52f6360e8a67c25d20b75aef3d69812b262e201cbc34fb297d22d2", size = 190580463, upload-time = "2022-02-02T16:00:51.745Z" },
+    { url = "https://files.pythonhosted.org/packages/33/dc/cffc92480f5f07975da3084ec75d54de38f295034c87cf85db7adf4dc272/tensorflow_cpu-2.8.0-cp38-cp38-win_amd64.whl", hash = "sha256:103a687e33ffe201e492a3d58a59759e525311adac305e9694156d0b273eae34", size = 246905950, upload-time = "2022-02-02T16:12:22.475Z" },
+    { url = "https://files.pythonhosted.org/packages/24/70/594e7a4bf4007d9ec6972e98c34a72dd17c4572d8d44a759c182a84f1555/tensorflow_cpu-2.8.0-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:4dd0b34d16774f4636604d89ee814252a7e21ef4ae61734f4839c6173a60aca3", size = 217460720, upload-time = "2022-02-02T15:35:06.125Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/cb/fa2dfb61e1d551649dbe1060024a9b72ee016ec7bdc11dfbac99c6e93a4e/tensorflow_cpu-2.8.0-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:783e86af209747738a2a01540fc697a74467ce432a4527969960c13095af5c0f", size = 190602382, upload-time = "2022-02-02T16:01:12.508Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/cb/dcc5b2a43a5febe0155b255db34f1bfdc535359065cad1394a1e5a98bb4c/tensorflow_cpu-2.8.0-cp39-cp39-win_amd64.whl", hash = "sha256:9205b54b6dc34e5824c54ef58296b440af5d580be412038fe6e35f9f894a887f", size = 246935302, upload-time = "2022-02-02T16:12:44.086Z" },
 ]
 
 [[package]]
