@@ -798,7 +798,6 @@ dev = [
     { name = "notebook", version = "7.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
     { name = "notebook", version = "7.4.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "ruff" },
-    { name = "tensorflow-serving-api" },
 ]
 
 [package.metadata]
@@ -816,7 +815,6 @@ dev = [
     { name = "ipykernel", specifier = ">=6.16.2" },
     { name = "notebook", specifier = ">=6.5.7" },
     { name = "ruff", specifier = ">=0.14.1" },
-    { name = "tensorflow-serving-api" },
 ]
 
 [[package]]
@@ -4203,21 +4201,6 @@ dependencies = [
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/20/e7/b4dcc898ca1c250ff1f1e431a3fdd2b347663283e8aea282704d59e92ad9/tensorflow_metadata-1.8.0-py3-none-any.whl", hash = "sha256:65c47207efeaff6b514196d2d420dbb7762f0a07336e1798731f90c81541ab11", size = 50516, upload-time = "2022-05-09T22:30:57.993Z" },
-]
-
-[[package]]
-name = "tensorflow-serving-api"
-version = "2.8.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "grpcio", version = "1.62.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
-    { name = "grpcio", version = "1.70.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
-    { name = "grpcio", version = "1.76.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
-    { name = "protobuf" },
-    { name = "tensorflow" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/e1/64a9d111720e98bad94a4a4fcfd5a0d2aa8cc6ce50a761989f37f4a65b28/tensorflow_serving_api-2.8.0-py2.py3-none-any.whl", hash = "sha256:d0790df170c582b2bddd894c7469787f873437ea8936bef7e034f86ed91bd6b4", size = 37788, upload-time = "2022-02-09T21:45:59.605Z" },
 ]
 
 [[package]]

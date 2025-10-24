@@ -1,11 +1,11 @@
 import requests
 import json
 
-def test_input_schema():
+def test_input_schema(host):
     with open('data/input_api_schema.json', "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
-    url = "http://127.0.0.1:8000/test_preprocess"
+    url = f"{host}/test_preprocess"
 
     try:
         response = requests.post(url, json=input_data)
@@ -26,15 +26,15 @@ def test_input_schema():
     except requests.exceptions.RequestException as e:
         print(f"Test Preprocess endpoint: An error occurred: {e}")
         print(
-            "Test Preprocess endpoint: Ensure FastAPI application is running at http://127.0.0.1:8000."
+            f"Test Preprocess endpoint: Ensure FastAPI application is running at {host}."
         )
 
 
-def test_predict_endpoint():
+def test_predict_endpoint(host):
     with open("data/input_api_schema.json", "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
-    url = "http://127.0.0.1:8000/predict"
+    url = f"{host}/predict"
 
     try:
         response = requests.post(url, json=input_data)
@@ -58,11 +58,22 @@ def test_predict_endpoint():
     except requests.exceptions.RequestException as e:
         print(f"Predict endpoint: An error occurred: {e}")
         print(
-            "Predict endpoint: FastAPI 애플리케이션이 http://127.0.0.1:8000 에서 실행 중인지 확인하세요."
+            f"Predict endpoint: FastAPI 애플리케이션이 {host} 에서 실행 중인지 확인하세요."
         )
 
 
 if __name__ == "__main__":
-    print(f"Ping endpoint: {requests.get('http://127.0.0.1:8000/ping')}")
-    test_input_schema()
-    test_predict_endpoint()
+    import argparse
+    parser = argparse.ArgumentParser(description="명령행 인자 테스트 예제")
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="http://127.0.0.1:8000",
+        help="FastAPI 애플리케이션의 호스트 URL",
+    )
+    args = parser.parse_args()
+    host = args.host
+    print(f"Testing FastAPI application at {host}")
+    print(f"Ping endpoint: {requests.get(f'{host}/ping')}")
+    test_input_schema(host)
+    test_predict_endpoint(host)
