@@ -2,7 +2,7 @@ import os
 import logging
 
 from google.cloud import aiplatform
-from deploy import get_local_cpr_model
+from deploy import get_local_model
 
 
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +16,7 @@ aiplatform.init(project=os.getenv("PROJECT_ID"), location=os.getenv("REGION"))
 # Build and Push CPR Image
 # ====================================================================
 logging.info(f"Building CPR image: {os.getenv('IMAGE_URI')}")
-local_model = get_local_cpr_model()
+local_model = get_local_model()
 logging.info("Pushing image to Artifact Registry...")
 local_model.push_image() 
 logging.info("Image push successful.")

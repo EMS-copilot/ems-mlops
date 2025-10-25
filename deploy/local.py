@@ -6,7 +6,7 @@ ENV_VARS_DICT = {
     "AIP_META_DIR": os.getenv('AIP_META_DIR'),
 }
 
-def get_local_model():
+def get_local_cpr_model():
     try:
         from predictor import CustomPredictor
     except ImportError:
@@ -27,3 +27,4 @@ def get_local_model():
         EnvVar(name=key, value=value) for key, value in ENV_VARS_DICT.items()
     ]
     return local_model
+

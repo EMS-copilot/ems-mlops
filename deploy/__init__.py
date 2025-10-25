@@ -1,1 +1,1 @@
-from deploy.local_model import get_local_model
+from deploy.local import get_local_cpr_model

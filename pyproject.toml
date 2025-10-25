@@ -8,6 +8,8 @@ dependencies = [
     "tensorflow-cpu==2.8.0",
     "numpy<=1.21.6",    
     "struct2tensor>=0.39.0",
+    "google-cloud-aiplatform[prediction]",
+
 ]
 
 [tool.uvicorn.reload]
@@ -18,11 +20,10 @@ dev = [
     "ruff>=0.14.1",
 ]
 container = [
-    "tensorflow-addons==0.16.1",
     "gunicorn>=23.0.0",
+    "fastapi", 
+    "uvicorn"
 ]
-routine = [
-    "google-cloud-aiplatform[prediction]",
-]
+
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
