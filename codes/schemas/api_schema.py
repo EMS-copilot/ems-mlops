@@ -33,3 +33,12 @@ class OutputSchema(BaseModel):
     patient_id: str
     result_method: str
     predictions: List[Prediction]
+
+# Vertex AI 표준 요청 형식을 위한 스키마
+class PredictionRequestSchema(BaseModel):
+    """
+    Vertex AI Prediction API에서 기대하는 최상위 JSON 구조입니다.
+    데이터는 'instances'라는 키의 리스트 안에 담겨 옵니다.
+    """
+    instances: List[InputSchema]
+    

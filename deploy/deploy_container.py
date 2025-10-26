@@ -2,7 +2,7 @@ import os
 import logging
 
 from google.cloud import aiplatform
-from deploy import get_local_model
+from deploy.local import get_local_model
 
 
 logging.basicConfig(level=logging.INFO)

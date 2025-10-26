@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request, status, HTTPException
 from contextlib import asynccontextmanager
 
 from predictor import CustomPredictor 
-from codes.schemas import InputSchema
+from codes.schemas import PredictionRequestSchema
 from codes import setup_logging
 
 setup_logging()
@@ -37,16 +37,20 @@ def ping():
     return {"status": "ready"}
 
 @app.post("/predict")
-async def predict_endpoint(request: Request, request_data: InputSchema):
+async def predict_endpoint(request: Request, request_data: PredictionRequestSchema):
     predictor = request.app.state.predictor
     if predictor is None:
         raise HTTPException(status_code=503, detail="Service Unavailable: Model not loaded.")
 
     try:
-        results = predictor.predict(request_data.model_dump())
+        predictions = []
         
-        return results
-        
+        for instance in request_data.instances:
+            instance_data = instance.model_dump()
+            result = predictor.predict(instance_data) 
+            predictions.append(result)
+            
+        return {"predictions": predictions}
     except Exception as e:
         logging.error(f"Predict endpoint: Prediction execution failed: {e}")
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")

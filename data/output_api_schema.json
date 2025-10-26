@@ -1,11 +1,47 @@
 {
-  "patient_id": "p12345",
-  "result_method": "topK",
   "predictions": [
-    { "hospital_id": "CBH_001", "score": 0.87, "explanations": {"eta":        -0.12, "icu": 0.3 } }, 
-    { "hospital_id": "CBH_014", "score": 0.72, "explanations": {"specialist":  0.25             } },
-    { "hospital_id": "CBH_007", "score": 0.63, "explanations": {"specialist": -0.25             } },
-    { "hospital_id": "CBH_005", "score": 0.54, "explanations": {"eta":        -0.45, "icu": 0.2 } },
-    { "hospital_id": "CBH_012", "score": 0.21, "explanations": {"specialist": 10.25             } }
+    {
+      "patient_id": "p12345",
+      "result_method": "topK",
+      "predictions": [
+        {
+          "hospital_id": "CBH_001",
+          "score": 0.87,
+          "explanations": {
+            "eta": -0.12,
+            "icu": 0.3
+          }
+        },
+        {
+          "hospital_id": "CBH_014",
+          "score": 0.72,
+          "explanations": {
+            "specialist": 0.25
+          }
+        },
+        {
+          "hospital_id": "CBH_007",
+          "score": 0.63,
+          "explanations": {
+            "specialist": -0.25
+          }
+        },
+        {
+          "hospital_id": "CBH_005",
+          "score": 0.54,
+          "explanations": {
+            "eta": -0.45,
+            "icu": 0.2
+          }
+        },
+        {
+          "hospital_id": "CBH_012",
+          "score": 0.21,
+          "explanations": {
+            "specialist": 10.25
+          }
+        }
+      ]
+    }
   ]
 }
