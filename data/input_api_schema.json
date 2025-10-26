@@ -2,7 +2,7 @@
     "instances": [
         {
             "patient": {
-                "id": "p12345",
+                "id": "patient_11e57c2297044901bfe465848e38b15b",
                 "age": 55,
                 "sex": "M",
                 "triage_level": 3,
@@ -12,20 +12,164 @@
             },
             "candidate_hospitals": [
                 {
-                    "hospital_id": "chh-001",
-                    "hospital_capacity": 45,
-                    "icu_beds": 3,
+                    "hospital_id": "CBH-001",
+                    "hospital_capacity": 75,
+                    "icu_beds": 10,
+                    "er_beds": 15,
+                    "distance_km": 5.0,
+                    "eta_minutes": 10
+                },
+                {
+                    "hospital_id": "CBH-002",
+                    "hospital_capacity": 80,
+                    "icu_beds": 8,
                     "er_beds": 10,
-                    "distance_km": 12.3,
+                    "distance_km": 15.0,
                     "eta_minutes": 20
                 },
                 {
-                    "hospital_id": "chh-002",
-                    "hospital_capacity": 65,
-                    "icu_beds": 0,
-                    "er_beds": 8,
-                    "distance_km": 8.7,
+                    "hospital_id": "CBH-003",
+                    "hospital_capacity": 70,
+                    "icu_beds": 12,
+                    "er_beds": 18,
+                    "distance_km": 30.0,
+                    "eta_minutes": 35
+                },
+                {
+                    "hospital_id": "CBH-004",
+                    "hospital_capacity": 85,
+                    "icu_beds": 14,
+                    "er_beds": 20,
+                    "distance_km": 28.0,
+                    "eta_minutes": 35
+                },
+                {
+                    "hospital_id": "CBH-005",
+                    "hospital_capacity": 80,
+                    "icu_beds": 14,
+                    "er_beds": 20,
+                    "distance_km": 35.0,
+                    "eta_minutes": 40
+                },
+                {
+                    "hospital_id": "CBH-006",
+                    "hospital_capacity": 90,
+                    "icu_beds": 14,
+                    "er_beds": 25,
+                    "distance_km": 40.0,
+                    "eta_minutes": 50
+                },
+                {
+                    "hospital_id": "CBH-007",
+                    "hospital_capacity": 75,
+                    "icu_beds": 14,
+                    "er_beds": 20,
+                    "distance_km": 50.0,
+                    "eta_minutes": 60
+                },
+                {
+                    "hospital_id": "CBH-008",
+                    "hospital_capacity": 95,
+                    "icu_beds": 14,
+                    "er_beds": 25,
+                    "distance_km": 55.0,
+                    "eta_minutes": 60
+                },
+                {
+                    "hospital_id": "CBH-009",
+                    "hospital_capacity": 80,
+                    "icu_beds": 12,
+                    "er_beds": 18,
+                    "distance_km": 50.0,
+                    "eta_minutes": 55
+                },
+                {
+                    "hospital_id": "CBH-010",
+                    "hospital_capacity": 70,
+                    "icu_beds": 10,
+                    "er_beds": 12,
+                    "distance_km": 60.0,
+                    "eta_minutes": 65
+                },
+                {
+                    "hospital_id": "CBH-011",
+                    "hospital_capacity": 85,
+                    "icu_beds": 14,
+                    "er_beds": 20,
+                    "distance_km": 6.0,
                     "eta_minutes": 12
+                },
+                {
+                    "hospital_id": "CBH-012",
+                    "hospital_capacity": 65,
+                    "icu_beds": 8,
+                    "er_beds": 10,
+                    "distance_km": 70.0,
+                    "eta_minutes": 75
+                },
+                {
+                    "hospital_id": "CBH-013",
+                    "hospital_capacity": 60,
+                    "icu_beds": 8,
+                    "er_beds": 12,
+                    "distance_km": 75.0,
+                    "eta_minutes": 80
+                },
+                {
+                    "hospital_id": "CBH-014",
+                    "hospital_capacity": 78,
+                    "icu_beds": 12,
+                    "er_beds": 15,
+                    "distance_km": 20.0,
+                    "eta_minutes": 25
+                },
+                {
+                    "hospital_id": "CBH-015",
+                    "hospital_capacity": 65,
+                    "icu_beds": 6,
+                    "er_beds": 8,
+                    "distance_km": 45.0,
+                    "eta_minutes": 50
+                },
+                {
+                    "hospital_id": "CBH-016",
+                    "hospital_capacity": 88,
+                    "icu_beds": 14,
+                    "er_beds": 25,
+                    "distance_km": 8.0,
+                    "eta_minutes": 15
+                },
+                {
+                    "hospital_id": "CBH-017",
+                    "hospital_capacity": 90,
+                    "icu_beds": 14,
+                    "er_beds": 22,
+                    "distance_km": 42.0,
+                    "eta_minutes": 52
+                },
+                {
+                    "hospital_id": "CBH-018",
+                    "hospital_capacity": 82,
+                    "icu_beds": 14,
+                    "er_beds": 20,
+                    "distance_km": 48.0,
+                    "eta_minutes": 55
+                },
+                {
+                    "hospital_id": "CBH-019",
+                    "hospital_capacity": 75,
+                    "icu_beds": 10,
+                    "er_beds": 12,
+                    "distance_km": 22.0,
+                    "eta_minutes": 27
+                },
+                {
+                    "hospital_id": "CBH-020",
+                    "hospital_capacity": 80,
+                    "icu_beds": 12,
+                    "er_beds": 15,
+                    "distance_km": 18.0,
+                    "eta_minutes": 22
                 }
             ],
             "result_method": {

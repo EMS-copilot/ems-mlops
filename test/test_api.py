@@ -1,8 +1,8 @@
 import requests
 import json
 
-def test_predict_endpoint(host):
-    with open("data/input_api_schema.json", "r", encoding="utf-8") as f:
+def test_predict_endpoint(host, file="data/input_api_schema.json"):
+    with open(file, "r", encoding="utf-8") as f:
         input_data = json.load(f)
 
     url = f"{host}/predict"
@@ -40,10 +40,17 @@ if __name__ == "__main__":
         "--host",
         type=str,
         default="http://127.0.0.1:8000",
-        help="FastAPI 애플리케이션의 호스트 URL",
+        help="FastAPI host URL",
+    )
+    parser.add_argument(
+        "--file",
+        type=str,
+        default="data/input_api_schema.json",
+        help="json file for prediction input",
     )
     args = parser.parse_args()
     host = args.host
+    file = args.file
     print(f"Testing FastAPI application at {host}")
     print(f"Ping endpoint: {requests.get(f'{host}/ping')}")
-    test_predict_endpoint(host)
+    test_predict_endpoint(host, file)
