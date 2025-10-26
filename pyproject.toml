@@ -1,6 +1,6 @@
 [project]
 name = "ems-wrapper"
-version = "0.4.1"
+version = "0.1.0"
 description = "ML pipelines for EMS-Copilot: development and deployment"
 readme = "README.md"
 requires-python = ">=3.7,<3.10"
