@@ -14,7 +14,6 @@ class Patient(BaseModel):
     symptom: str
     bp_systolic: int = Field(**constraints.get("bp_systolic", {}))
     hr: int = Field(**constraints.get("hr", {}))
-
     SYMPTOM_MAP: ClassVar[dict[int, list[str]]] = {int(k) : v for k, v in constraints["SYMPTOM_MAP"].items()}
 
     @model_validator(mode="after")

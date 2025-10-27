@@ -1,8 +1,8 @@
 import io
 import csv
 import json
+import logging
 
-from types import MappingProxyType
 from typing import List, Dict, Callable
 from dataclasses import dataclass
 from collections.abc import Mapping
@@ -12,10 +12,10 @@ from collections.abc import Mapping
 class StaticResources:
     features: List[str]
     hospital_meta: Mapping[str, dict]
-    
+
 
 def load_features(gcs_uri: str, download_func: Callable[[str], bytes]) -> List[str]:
-    print(f"Loading features from GCS: {gcs_uri}")
+    logging.info(f"Loading features from GCS: {gcs_uri}")
 
     data_bytes = download_func(gcs_uri)
     features = json.loads(data_bytes.decode("utf-8"))
@@ -29,7 +29,7 @@ def load_features(gcs_uri: str, download_func: Callable[[str], bytes]) -> List[s
 def load_hospital_meta(
     gcs_uri: str, download_func: Callable[[str], bytes]
 ) -> Dict[str, dict]:
-    print(f"Loading hospital metadata from GCS: {gcs_uri}")
+    logging.info(f"Loading hospital metadata from GCS: {gcs_uri}")
 
     data_bytes = download_func(gcs_uri)
     data_stream = io.StringIO(data_bytes.decode("utf-8"))

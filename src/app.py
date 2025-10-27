@@ -7,18 +7,19 @@ from predictor import CustomPredictor
 from schemas import PredictionRequestSchema
 from utils import setup_logging
 
-setup_logging()
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 MODEL_DIR = os.getenv("AIP_MODEL_DIR", ".") 
-META_DIR = os.getenv("AIP_META_DIR", ".") 
-FEATURE_DIR = os.getenv("AIP_FEATURE_DIR", ".")
+META_PATH = os.getenv("AIP_META_PATH", ".") 
+FEATURE_PATH = os.getenv("AIP_FEATURE_PATH", ".")
+
+setup_logging()
 logging.info("App startup: Running in PRODUCTION mode: Using AIP model and meta directories.")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        app.state.predictor = CustomPredictor()
+        app.state.predictor = CustomPredictor(FEATURE_PATH, META_PATH)
         app.state.predictor.load(artifact_uri=MODEL_DIR)
         logging.info("App startup: Predictor initialized successfully.")
     except Exception as e:

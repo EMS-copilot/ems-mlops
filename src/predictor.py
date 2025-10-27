@@ -17,12 +17,12 @@ from utils import download_all_artifacts, download_single_file_to_memory
 
 
 class CustomPredictor:
-    def __init__(self) -> None:
+    def __init__(self, feature_path, meta_path) -> None:
         self._model: Any = None
         self._input_key: str = None
         self._static:StaticResources = get_static(
-            os.getenv("AIP_FEATURE_DIR"),
-            os.getenv("AIP_META_DIR"),
+            feature_path,
+            meta_path,
             download_single_file_to_memory,
         )
         logging.info("Static resources initialized.")

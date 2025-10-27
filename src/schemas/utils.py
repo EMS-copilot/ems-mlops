@@ -1,19 +1,37 @@
+import os
 import json
+import logging
 from pathlib import Path
 from typing import Annotated
+
 from pydantic import BaseModel, Field
 
+from utils import download_single_file_to_memory
 
-def _load_all_constraints() -> dict:
-    constraints_path = Path(__file__).parent.parent.parent / "data" / "constraints.json"
-    if not constraints_path.exists():
+def _load_constraints(gcs_uri):
+    constraints_path = Path(__file__).parent.parent.parent / os.getenv("LOCAL_CONSTRAINT_PATH")
+
+    if constraints_path.exists():
+        with open(constraints_path, "r") as f:
+            return json.load(f)
+    else:
+        logging.info(f"Loading schema constraint from GCS: {gcs_uri}")
+        return _load_all_constraints(gcs_uri)
+
+def _load_all_constraints(gcs_uri: str) -> dict:
+    try:
+        raw_bytes = download_single_file_to_memory(gcs_uri)
+        return json.loads(raw_bytes.decode("utf-8"))
+    except FileNotFoundError:
         return {}
-    with open(constraints_path, "r") as f:
-        return json.load(f)
+    except Exception as e:
+        raise RuntimeError(f"Failed to load constraints: {e}")
 
-ALL_CONSTRAINTS = _load_all_constraints()
+
+ALL_CONSTRAINTS = _load_constraints(os.getenv("AIP_CONSTRAINT_PATH"))
 
 def get_constraints(model_name: str) -> dict:
+    global ALL_CONSTRAINTS 
     return ALL_CONSTRAINTS.get(model_name, {})
 
 
