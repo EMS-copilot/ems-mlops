@@ -246,25 +246,25 @@ wheels = [
 
 [[package]]
 name = "ems-wrapper"
-version = "0.4.1"
+version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "fastapi", version = "0.103.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "fastapi", version = "0.114.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
     { name = "google-cloud-aiplatform", version = "1.15.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
     { name = "google-cloud-aiplatform", version = "1.90.0", source = { registry = "https://pypi.org/simple" }, extra = ["prediction"], marker = "python_full_version == '3.8.*'" },
     { name = "google-cloud-aiplatform", version = "1.122.0", source = { registry = "https://pypi.org/simple" }, extra = ["prediction"], marker = "python_full_version >= '3.9'" },
     { name = "numpy" },
     { name = "struct2tensor" },
     { name = "tensorflow-cpu" },
+    { name = "uvicorn", version = "0.22.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "uvicorn", version = "0.33.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "uvicorn", version = "0.38.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 
 [package.dev-dependencies]
 container = [
-    { name = "fastapi", version = "0.103.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
-    { name = "fastapi", version = "0.114.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
     { name = "gunicorn" },
-    { name = "uvicorn", version = "0.22.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
-    { name = "uvicorn", version = "0.33.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
-    { name = "uvicorn", version = "0.38.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 dev = [
     { name = "ruff" },
@@ -272,18 +272,16 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "fastapi" },
     { name = "google-cloud-aiplatform", extras = ["prediction"] },
     { name = "numpy", specifier = "<=1.21.6" },
     { name = "struct2tensor", specifier = ">=0.39.0" },
     { name = "tensorflow-cpu", specifier = "==2.8.0" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata.requires-dev]
-container = [
-    { name = "fastapi" },
-    { name = "gunicorn", specifier = ">=23.0.0" },
-    { name = "uvicorn" },
-]
+container = [{ name = "gunicorn", specifier = ">=23.0.0" }]
 dev = [{ name = "ruff", specifier = ">=0.14.1" }]
 
 [[package]]

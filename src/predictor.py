@@ -1,27 +1,33 @@
 import os
 import logging
 from typing import List, Dict, Any
+
 import tensorflow as tf
 import struct2tensor.ops.gen_decode_proto_sparse
 
 from codes import (
-    StaticResources,
     BatchInfo,
-    download_all_artifacts,
+    StaticResources, 
+    get_static,
     custom_preprocess,
     custom_postprocess,
 )
+
+from utils import download_all_artifacts, download_single_file_to_memory
 
 
 class CustomPredictor:
     def __init__(self) -> None:
         self._model: Any = None
         self._input_key: str = None
-        self._static = StaticResources(
-            os.getenv("AIP_FEATURE_DIR"), os.getenv("AIP_META_DIR")
+        self._static:StaticResources = get_static(
+            os.getenv("AIP_FEATURE_DIR"),
+            os.getenv("AIP_META_DIR"),
+            download_single_file_to_memory,
         )
-        self._batch_info = BatchInfo()
         logging.info("Static resources initialized.")
+
+        self._batch_info:BatchInfo = BatchInfo()
 
     def load(self, artifact_uri):
         local_model_path = download_all_artifacts(artifact_uri)

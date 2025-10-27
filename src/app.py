@@ -4,8 +4,8 @@ from fastapi import FastAPI, Request, status, HTTPException
 from contextlib import asynccontextmanager
 
 from predictor import CustomPredictor 
-from codes.schemas import PredictionRequestSchema
-from codes import setup_logging
+from schemas import PredictionRequestSchema
+from utils import setup_logging
 
 setup_logging()
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"

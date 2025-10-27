@@ -1,5 +1,6 @@
-import tensorflow as tf
 from typing import Dict
+import tensorflow as tf
+
 from codes.batch_info import BatchInfo
 
 

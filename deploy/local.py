@@ -8,7 +8,7 @@ ENV_VARS_DICT = {
 
 def get_local_cpr_model():
     try:
-        from predictor import CustomPredictor
+        from src.predictor import CustomPredictor
     except ImportError:
         return None
 

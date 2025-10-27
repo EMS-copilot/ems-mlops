@@ -9,7 +9,8 @@ dependencies = [
     "numpy<=1.21.6",    
     "struct2tensor>=0.39.0",
     "google-cloud-aiplatform[prediction]",
-
+    "fastapi", 
+    "uvicorn"
 ]
 
 [tool.uvicorn.reload]
@@ -21,8 +22,6 @@ dev = [
 ]
 container = [
     "gunicorn>=23.0.0",
-    "fastapi", 
-    "uvicorn"
 ]
 
 [tool.ruff.per-file-ignores]
