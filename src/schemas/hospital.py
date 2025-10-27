@@ -1,8 +1,8 @@
-from typing import Literal
-from pydantic import BaseModel, ConfigDict, Field, create_model
-from .utils import get_constraints
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+from .utils import Coord, get_constraints
 
 constraints = get_constraints("hospital")
+
 
 class HospitalNoMeta(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -11,11 +11,21 @@ class HospitalNoMeta(BaseModel):
     icu_beds: float = Field(**constraints.get("icu_beds", {}))
     er_beds: float = Field(**constraints.get("er_beds", {}))
 
-Hospital = create_model(
-    "Hospital",
-    hospital_area=(Literal[tuple(constraints["hospital_area"])], ...),
-    is_24h=(bool, ...),
-    has_er=(bool, ...),
-    is_regional_center=(bool, ...),
-    specialist_oncall=(bool, ...),
-)
+
+class Hospital(HospitalNoMeta):
+    hospital_area: str
+    is_24h: bool
+    has_er: bool
+    is_regional_center: bool
+    specialist_oncall: bool
+
+    @field_validator("hospital_area")
+    def validate_hospital_area(cls, v: str):
+        allowed = constraints["hospital"]["hospital_area"]
+        if v not in allowed:
+            raise ValueError(f"hospital_area must be one of {allowed}, got {v!r}")
+        return v
+
+
+class HospitalWithLocation(Hospital):
+    location: Coord
