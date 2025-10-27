@@ -11,4 +11,4 @@ wheels/
 .envrc
 .bin/
 local_model_assets/
-white-sunspot-473307-p3-*
+white-sunspot-473307-p3*
