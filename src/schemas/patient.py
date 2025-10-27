@@ -1,26 +1,21 @@
-from typing import Annotated, ClassVar, Literal
+from typing import ClassVar, Literal
 from pydantic import BaseModel, Field, model_validator, ConfigDict
-from .utils import Coord
+from .utils import Coord, get_constraints
 
+constraints = get_constraints("patient")
 
 class Patient(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     id: str
-    age: Annotated[int, Field(ge=0, le=120)]
+    age: int = Field(**constraints.get("age", {}))
     sex: Literal["M", "F"]
-    triage_level: Annotated[int, Field(ge=1, le=5)]
+    triage_level: int = Field(**constraints.get("triage_level", {}))
     symptom: str
-    bp_systolic: Annotated[int, Field(ge=40, le=200)]
-    hr: Annotated[int, Field(ge=30, le=200)]
+    bp_systolic: int = Field(**constraints.get("bp_systolic", {}))
+    hr: int = Field(**constraints.get("hr", {}))
 
-    SYMPTOM_MAP: ClassVar[dict[int, list[str]]] = {
-        1: ["shock", "coma"],
-        2: ["bleeding", "chest_pain"],
-        3: ["fever", "흉통"],
-        4: ["cough", "dizziness"],
-        5: ["mild", "headache"],
-    }
+    SYMPTOM_MAP: ClassVar[dict[int, list[str]]] = {int(k) : v for k, v in constraints["SYMPTOM_MAP"].items()}
 
     @model_validator(mode="after")
     def check_symptom_vs_triage(self):

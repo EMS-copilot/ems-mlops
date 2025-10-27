@@ -1,0 +1,80 @@
+{
+  "patient": {
+    "age": {
+      "ge": 0,
+      "le": 120
+    },
+    "sex": {
+      "allowed": [
+        "M",
+        "F"
+      ]
+    },
+    "triage_level": {
+      "ge": 1,
+      "le": 5
+    },
+    "bp_systolic": {
+      "ge": 40,
+      "le": 200
+    },
+    "hr": {
+      "ge": 30,
+      "le": 200
+    },
+    "SYMPTOM_MAP": {
+      "1": [
+        "shock",
+        "coma"
+      ],
+      "2": [
+        "bleeding",
+        "chest_pain"
+      ],
+      "3": [
+        "fever",
+        "흉통"
+      ],
+      "4": [
+        "cough",
+        "dizziness"
+      ],
+      "5": [
+        "mild",
+        "headache"
+      ]
+    }
+  },
+  "hospital": {
+    "hospital_capacity": {
+      "ge": 4,
+      "le": 99
+    },
+    "icu_beds": {
+      "ge": -1,
+      "le": 14
+    },
+    "er_beds": {
+      "ge": -1,
+      "le": 25
+    },
+    "hospital_area": {
+      "allowed": [
+        "충주시",
+        "안성시",
+        "이천시",
+        "제천시",
+        "원주시",
+        "보은군",
+        "단양군",
+        "영동군",
+        "괴산군",
+        "음성군",
+        "청주시",
+        "옥천군",
+        "증평군",
+        "진천군"
+      ]
+    }
+  }
+}
