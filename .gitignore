@@ -10,5 +10,5 @@ wheels/
 .venv
 .envrc
 .bin/
-local_model_assets/
+.bin
 white-sunspot-473307-p3*

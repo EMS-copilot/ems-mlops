@@ -1,1 +1,0 @@
-from deploy.local import get_local_cpr_model

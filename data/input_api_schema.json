@@ -178,11 +178,11 @@
         }, 
         {
             "patient": {
-                "id": "patient_11e57c2297044901bfe465848e38b15b",
+                "id": "patient_11e57c2297044901bfe465848e38b15e",
                 "age": 12,
                 "sex": "F",
                 "triage_level": 2,
-                "symptom": "의식 저하",
+                "symptom": "의식저하",
                 "bp_systolic": 82,
                 "hr": 120
             },
