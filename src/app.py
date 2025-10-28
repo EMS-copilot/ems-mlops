@@ -1,17 +1,18 @@
-import os
 import logging
-from fastapi import FastAPI, Request, status, HTTPException
+import os
 from contextlib import asynccontextmanager
 
-from predictor import CustomPredictor 
+from fastapi import FastAPI, HTTPException, Request, status
+
+from predictor import CustomPredictor
 from schemas import PredictionRequestSchema
 from utils import setup_logging
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 MODEL_DIR = os.getenv("AIP_MODEL_DIR", ".") 
-META_PATH = os.getenv("AIP_META_PATH", ".") 
-FEATURE_PATH = os.getenv("AIP_FEATURE_PATH", ".")
+META_FILE = os.getenv("AIP_META_FILE", ".") 
+FEATURE_FILE = os.getenv("AIP_FEATURE_FILE", ".")
 
 setup_logging()
 logging.info("App startup: Running in PRODUCTION mode: Using AIP model and meta directories.")
@@ -19,7 +20,7 @@ logging.info("App startup: Running in PRODUCTION mode: Using AIP model and meta 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        app.state.predictor = CustomPredictor(FEATURE_PATH, META_PATH)
+        app.state.predictor = CustomPredictor(FEATURE_FILE, META_FILE)
         app.state.predictor.load(artifact_uri=MODEL_DIR)
         logging.info("App startup: Predictor initialized successfully.")
     except Exception as e:

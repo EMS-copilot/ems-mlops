@@ -1,7 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from .utils import Coord, get_constraints
 
-constraints = get_constraints("patient")
+constraints = get_constraints()
 
 
 class Patient(BaseModel):

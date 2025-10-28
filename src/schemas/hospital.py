@@ -1,7 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from .utils import Coord, get_constraints
 
-constraints = get_constraints("hospital")
+constraints = get_constraints()
 
 
 class HospitalNoMeta(BaseModel):
@@ -21,7 +22,8 @@ class Hospital(HospitalNoMeta):
 
     @field_validator("hospital_area")
     def validate_hospital_area(cls, v: str):
-        allowed = constraints["hospital"]["hospital_area"]
+        v = v.strip()
+        allowed = constraints["hospital"]["hospital_area"]["allowed"]
         if v not in allowed:
             raise ValueError(f"hospital_area must be one of {allowed}, got {v!r}")
         return v

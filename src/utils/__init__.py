@@ -1,2 +1,2 @@
-from utils.logger_config import setup_logging
-from utils.gcs_utils import download_all_artifacts, download_single_file_to_memory
+from .logger_config import setup_logging
+from .gcs_utils import download_all_artifacts, download_single_file_to_memory
