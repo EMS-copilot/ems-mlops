@@ -1,6 +1,6 @@
 from typing import Protocol, Iterator
 
-from data_factory.types.types import SimHospitalState, PatientWithLocation, Coord
+from data_factory.types import SimHospitalState, PatientWithLocation, Coord
 
 
 class AcceptanceStrategy(Protocol):

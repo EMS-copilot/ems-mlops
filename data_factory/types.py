@@ -19,6 +19,7 @@ class AROutcome:
     hr: float
     hosp_occ: Dict[str, int]
     hosp_eff_cap: Dict[str, int]
+    distance_km: float
 
 
 class ARLog:

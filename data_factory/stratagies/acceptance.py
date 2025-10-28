@@ -9,7 +9,7 @@ class DefaultAcceptance(AcceptanceStrategy):
         self.arlog = arlog
 
     def on_call(
-        self, minute: float, patient: PatientWithLocation, hosp: SimHospitalState
+        self, minute: float, patient: PatientWithLocation, hosp: SimHospitalState, distance_km: float
     ) -> bool:
         hosp.calls_received += 1
         ok = False
@@ -37,12 +37,13 @@ class DefaultAcceptance(AcceptanceStrategy):
                 patient.hr,
                 {"icu": hosp.occ_icu, "er": hosp.occ_er, "hosp": hosp.occ_hosp},
                 {"icu": eff[0], "er": eff[1], "hosp": eff[2]},
+                distance_km,
             )
         )
         return ok
 
     def on_door(
-        self, minute: float, patient: PatientWithLocation, hosp: SimHospitalState
+        self, minute: float, patient: PatientWithLocation, hosp: SimHospitalState, distance_km: float
     ) -> bool:
         ok = hosp.occupancy_ok(minute, patient.triage_level)
         eff = hosp.effective_capacity(minute)
@@ -58,6 +59,7 @@ class DefaultAcceptance(AcceptanceStrategy):
                 patient.hr,
                 {"icu": hosp.occ_icu, "er": hosp.occ_er, "hosp": hosp.occ_hosp},
                 {"icu": eff[0], "er": eff[1], "hosp": eff[2]},
+                distance_km,
             )
         )
         return ok

@@ -1,6 +1,7 @@
 from data_factory.core import TimingModel
 from data_factory.types import PatientWithLocation
 
+
 class TriageTiming(TimingModel):
     def death_time(self, p: PatientWithLocation) -> float:
         return {1: 30, 2: 60, 3: 150, 4: 300, 5: 480}.get(p.triage_level, 150)

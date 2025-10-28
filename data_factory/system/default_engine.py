@@ -28,54 +28,80 @@ class System:
     def process_patient(self, p: PatientWithLocation):
         self.metrics.total_patients += 1
         call_start = self.env.now
-        sorted_h = sorted(
-            self.hospitals,
-            key=lambda h: self.travel.minutes(p.location, h.static.location),
-        )
-        accepted = None
-        eta = 0.0
-        for h in sorted_h:
-            if self.acceptance.on_call(self.env.now, p, h):
-                accepted = h
-                eta = self.travel.minutes(p.location, h.static.location)
-                break
-        while accepted is None:
+        current_location = p.location
+        
+        # deepcopy is required, because this list will be mutated
+        hospitals_to_try = self.hospitals[:]
+
+        while True:
             elapsed = self.env.now - call_start
             if elapsed >= self.timing.death_time(p):
                 self.metrics.prehospital_deaths += 1
+                # find nearest hospital for metric attribution
                 nearest = min(
                     self.hospitals,
-                    key=lambda h: self.travel.minutes(p.location, h.static.location),
+                    key=lambda h: self.travel.distance_km(current_location, h.static.location),
                 )
                 nearest.prehospital_deaths += 1
                 return
-            yield self.env.timeout(5)
-            for h in sorted_h:
-                if self.acceptance.on_call(self.env.now, p, h):
-                    accepted = h
-                    eta = self.travel.minutes(p.location, h.static.location)
+
+            hospitals_to_try.sort(
+                key=lambda h: self.travel.distance_km(current_location, h.static.location)
+            )
+
+            accepted_hosp = None
+            dist_km = 0.0
+            for h in hospitals_to_try:
+                dist_km = self.travel.distance_km(current_location, h.static.location)
+                if self.acceptance.on_call(self.env.now, p, h, dist_km):
+                    accepted_hosp = h
                     break
-        tta = self.env.now - call_start
-        accepted.time_to_accept_sum += tta
-        accepted.time_to_accept_n += 1
-        yield self.env.timeout(eta)
-        since = self.env.now - call_start
-        if since >= self.timing.death_time(p):
-            self.metrics.prehospital_deaths += 1
-            accepted.prehospital_deaths += 1
-            return
-        if not self.acceptance.on_door(self.env.now, p, accepted):
-            accepted.door_rejects += 1
-            return self.env.process(self.process_patient(p))
-        self.metrics.arrived += 1
-        accepted.arrivals_accepted += 1
-        if since > self.timing.golden_time(p):
-            self.metrics.inhospital_deaths += 1
-            accepted.inhospital_deaths += 1
-            return
-        tri = p.triage_level
-        accepted.occupy(tri)
-        yield self.env.timeout(self.timing.recovery_time(p))
-        accepted.release(tri)
-        self.metrics.discharged += 1
-        accepted.discharges += 1
+            
+            if accepted_hosp is None:
+                yield self.env.timeout(5)
+                continue
+
+            # travel to hospital
+            travel_time = self.travel.minutes(current_location, accepted_hosp.static.location)
+            
+            tta = self.env.now - call_start
+            accepted_hosp.time_to_accept_sum += tta
+            accepted_hosp.time_to_accept_n += 1
+
+            yield self.env.timeout(travel_time)
+
+            # check for death during travel
+            since_call = self.env.now - call_start
+            if since_call >= self.timing.death_time(p):
+                self.metrics.prehospital_deaths += 1
+                accepted_hosp.prehospital_deaths += 1
+                return
+
+            # at door
+            dist_km = self.travel.distance_km(p.location, accepted_hosp.static.location)
+            if self.acceptance.on_door(self.env.now, p, accepted_hosp, dist_km):
+                self.metrics.arrived += 1
+                accepted_hosp.arrivals_accepted += 1
+
+                if since_call > self.timing.golden_time(p):
+                    self.metrics.inhospital_deaths += 1
+                    accepted_hosp.inhospital_deaths += 1
+                    return
+                
+                # occupy bed and recover
+                tri = p.triage_level
+                accepted_hosp.occupy(tri)
+                yield self.env.timeout(self.timing.recovery_time(p))
+                accepted_hosp.release(tri)
+                self.metrics.discharged += 1
+                accepted_hosp.discharges += 1
+                return  # end of patient journey
+            else:
+                # rejected at door, try next hospital
+                accepted_hosp.door_rejects += 1
+                current_location = accepted_hosp.static.location
+                hospitals_to_try = [h for h in hospitals_to_try if h.static.hospital_id != accepted_hosp.static.hospital_id]
+                if not hospitals_to_try:
+                    # no more hospitals to try
+                    # this is effectively a prehospital death, but we will not count it dually
+                    return
