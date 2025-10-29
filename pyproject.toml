@@ -18,6 +18,7 @@ exclude = ["test/**"]
 
 [dependency-groups]
 dev = [
+    "pytest", 
     "ruff>=0.14.1",
 ]
 container = [
