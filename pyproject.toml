@@ -6,15 +6,13 @@ readme = "README.md"
 requires-python = ">=3.7,<3.10"
 dependencies = [
     "tensorflow-cpu==2.8.0",
-    "numpy<=1.21.6",    
+    "numpy<=1.21.6",
     "struct2tensor>=0.39.0",
     "google-cloud-aiplatform[prediction]",
-    "fastapi", 
-    "uvicorn"
+    "fastapi",
+    "uvicorn",
+    "pyyaml>=6.0.1",
 ]
-
-[tool.uvicorn.reload]
-exclude = ["test/**"]
 
 [dependency-groups]
 dev = [
@@ -23,6 +21,9 @@ dev = [
 container = [
     "gunicorn>=23.0.0",
 ]
+
+[tool.uvicorn.reload]
+exclude = ["test/**"]
 
 [tool.ruff]
 line-length = 100
