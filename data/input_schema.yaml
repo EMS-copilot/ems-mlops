@@ -1,0 +1,85 @@
+patient:
+  id:
+    type: "str"
+  age:
+    type: "str"
+    ge: 0
+    le: 120
+  sex:
+    type: "str"
+    allowed: ["M", "F"]
+  triage_level:
+    type: "int"
+    ge: 1
+    le: 5
+  bp_systolic:
+    type: "float"
+    ge: 40
+    le: 200
+  hr:
+    type: "float"
+    ge: 30
+    le: 200
+  symptom:
+    type: "str"
+    allowed:
+      - 의식저하
+      - 호흡곤란
+      - 뇌졸중
+      - 발열
+      - 출혈
+      - 두통
+      - 복통
+      - 외상
+      - 흉통
+      - 경련
+      - 화상
+      - 중독
+
+hospital:
+  metric:
+    hospital_capacity:
+      type: "int"
+      ge: 4
+      le: 99
+    icu_beds:
+      type: "int"
+      ge: -1
+      le: 14
+    er_beds:
+      type: "int"
+      ge: -1
+      le: 25
+  meta:
+    hospital_id:
+      type: "str"
+    hospital_name:
+      type: "str"
+    is_regional_center:
+      type: "bool"
+    is_24h:
+      type: "bool"
+    has_er:
+      type: "bool"
+    hospital_area:
+      type: "str"
+      allowed:
+        - 충주시
+        - 안성시
+        - 이천시
+        - 제천시
+        - 원주시
+        - 보은군
+        - 단양군
+        - 영동군
+        - 괴산군
+        - 음성군
+        - 청주시
+        - 옥천군
+        - 증평군
+        - 진천군
+  access_info:
+    distance_km:
+      type: "float"
+    eta_minutes:
+      type: "float"
