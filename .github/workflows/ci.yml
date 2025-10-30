@@ -1,0 +1,77 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]   # 필요에 맞게 브랜치 조정
+  pull_request:
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_URI: asia-northeast3-docker.pkg.dev/158656738463/ems-copilot-docker/ems-container-0.1.2
+      LOCAL_KEY_FILE: white-sunspot-473307-p3.json
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest requests
+
+      # 1. Unit test
+      - name: Run unit tests
+        run: pytest tests/test_unit.py
+
+      # 2. Local run (uvicorn) + API test
+      - name: Start local uvicorn server
+        run: |
+          nohup bash run.sh local > uvicorn.log 2>&1 &
+          sleep 10
+      - name: Run API tests against uvicorn
+        run: pytest tests/test_api.py --host=http://localhost:8000
+      - name: Kill uvicorn
+        run: pkill -f uvicorn || true
+
+      # 3. Local run (gunicorn) + API test
+      - name: Start local gunicorn server
+        run: |
+          nohup bash run.sh local guincorn > gunicorn.log 2>&1 &
+          sleep 10
+      - name: Run API tests against gunicorn
+        run: pytest tests/test_api.py --host=http://localhost:8080
+      - name: Kill gunicorn
+        run: pkill -f gunicorn || true
+
+      # 4. Build Docker image
+      - name: Build Docker image
+        run: docker build -t $IMAGE_URI .
+
+      # 5. Run container + API test
+      - name: Start container
+        run: |
+          nohup bash run.sh container local > container.log 2>&1 &
+          sleep 15
+      - name: Run API tests against container
+        run: pytest tests/test_api.py --host=http://localhost:8080
+      - name: Kill container
+        run: docker ps -q --filter "ancestor=$IMAGE_URI" | xargs -r docker stop
+
+      # 6. Push Docker image
+      - name: Authenticate to Artifact Registry
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Configure docker for Artifact Registry
+        run: gcloud auth configure-docker asia-northeast3-docker.pkg.dev
+      - name: Push Docker image
+        run: docker push $IMAGE_URI

@@ -15,3 +15,4 @@ wheels/
 .bin
 local_model/
 white-sunspot-473307-p3*
+actions-runner/
