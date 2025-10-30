@@ -16,7 +16,6 @@ def host(request):
 
 @pytest.fixture(scope="session")
 def load_json():
-    """JSON 파일 로더"""
     def _loader(filename: str):
         file_path = Path(filename)
         with file_path.open("r", encoding="utf-8") as f:
