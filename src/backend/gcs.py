@@ -3,7 +3,7 @@ import tempfile
 
 from google.cloud import storage
 
-from core import StorageBackend
+from src.core import StorageBackend
 
 
 class GCSBackend(StorageBackend):

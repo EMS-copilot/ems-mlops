@@ -2,7 +2,7 @@ import os
 import tempfile
 from google.cloud import storage
 
-LOCAL_ARTIFACT_DIR = os.path.join(tempfile.gettempdir(), "cpr_model_artifact")
+LOCAL_ARTIFACT_DIR = os.path.join(tempfile.gettempdir(), "model_artifact")
 
 
 def download_single_file_to_memory(gcs_uri: str) -> bytes:

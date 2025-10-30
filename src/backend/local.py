@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 
-from core import StorageBackend
+from src.core import StorageBackend
 
 
 class LocalBackend(StorageBackend):

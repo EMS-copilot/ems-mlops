@@ -5,7 +5,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
-from utils.gcs_utils import download_single_file_to_memory
+from src.utils.gcs_utils import download_single_file_to_memory
 
 
 def _load_constraints(gcs_uri):

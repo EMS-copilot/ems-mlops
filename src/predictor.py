@@ -5,14 +5,14 @@ from typing import List, Dict, Any
 import tensorflow as tf
 import struct2tensor.ops.gen_decode_proto_sparse
 
-import process
-from core import StaticResources, BatchInfo, get_static
-
-from core import StorageBackend
+from src import process
+from src.core import StaticResources, BatchInfo, StorageBackend, get_static
 
 
 class CustomPredictor:
-    def __init__(self, feature_path, meta_path, backend: StorageBackend) -> None:
+    def __init__(
+        self, feature_path, meta_path, backend: StorageBackend
+    ) -> None:
         self._model: Any = None
         self._backend: StorageBackend = backend
         self._input_key: str = None
@@ -33,22 +33,32 @@ class CustomPredictor:
             print("TensorFlow SavedModel successfully loaded.")
 
             inference_func = self._model.signatures["serving_default"]
-            self._input_key = list(inference_func.structured_input_signature[1].keys())[0]
+            self._input_key = list(
+                inference_func.structured_input_signature[1].keys()
+            )[0]
             print(f"Model expects input tensor key: {self._input_key}")
 
         except Exception as e:
-            raise RuntimeError(f"Failed to load TensorFlow SavedModel from {local_model_path}: {e}")
+            raise RuntimeError(
+                f"Failed to load TensorFlow SavedModel from {local_model_path}: {e}"
+            )
 
-    def preprocess(self, request_body: Dict) -> List:  # input_json: input_api_schema
+    def preprocess(
+        self, request_body: Dict
+    ) -> List:  # input_json: input_api_schema
         self._batch_info.update(request_body)
-        instances = process.pre(request_body, self._static.features, self._static.hospital_meta)
+        instances = process.pre(
+            request_body, self._static.features, self._static.hospital_meta
+        )
         logging.debug(f"instances: {instances}")
 
         return instances  # tf.Tensor
 
     def infer(self, instances) -> tf.Tensor:
         inference_func = self._model.signatures["serving_default"]
-        predictions = inference_func(**{self._input_key: tf.constant(instances)})
+        predictions = inference_func(
+            **{self._input_key: tf.constant(instances)}
+        )
         logging.debug(f"predictions: {predictions}")
 
         return predictions  # tf.Tensor
