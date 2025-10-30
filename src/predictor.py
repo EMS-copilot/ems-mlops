@@ -5,53 +5,43 @@ from typing import List, Dict, Any
 import tensorflow as tf
 import struct2tensor.ops.gen_decode_proto_sparse
 
-from pipelines import (
-    BatchInfo,
-    StaticResources, 
-    get_static,
-    custom_preprocess,
-    custom_postprocess,
-)
+import process
+from core import StaticResources, BatchInfo, get_static
 
-from utils import download_all_artifacts, download_single_file_to_memory
+from core import StorageBackend
 
 
 class CustomPredictor:
-    def __init__(self, feature_path, meta_path) -> None:
+    def __init__(self, feature_path, meta_path, backend: StorageBackend) -> None:
         self._model: Any = None
+        self._backend: StorageBackend = backend
         self._input_key: str = None
-        self._static:StaticResources = get_static(
+        self._static: StaticResources = get_static(
             feature_path,
             meta_path,
-            download_single_file_to_memory,
+            self._backend.download_file,
         )
         logging.info("Static resources initialized.")
 
-        self._batch_info:BatchInfo = BatchInfo()
+        self._batch_info: BatchInfo = BatchInfo()
 
     def load(self, artifact_uri):
-        local_model_path = download_all_artifacts(artifact_uri)
+        local_model_path = self._backend.download_artifact(artifact_uri)
 
         try:
             self._model = tf.saved_model.load(local_model_path)
             print("TensorFlow SavedModel successfully loaded.")
 
             inference_func = self._model.signatures["serving_default"]
-            self._input_key = list(inference_func.structured_input_signature[1].keys())[
-                0
-            ]
+            self._input_key = list(inference_func.structured_input_signature[1].keys())[0]
             print(f"Model expects input tensor key: {self._input_key}")
 
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to load TensorFlow SavedModel from {local_model_path}: {e}"
-            )
+            raise RuntimeError(f"Failed to load TensorFlow SavedModel from {local_model_path}: {e}")
 
     def preprocess(self, request_body: Dict) -> List:  # input_json: input_api_schema
         self._batch_info.update(request_body)
-        instances = custom_preprocess(
-            request_body, self._static.features, self._static.hospital_meta
-        )
+        instances = process.pre(request_body, self._static.features, self._static.hospital_meta)
         logging.debug(f"instances: {instances}")
 
         return instances  # tf.Tensor
@@ -64,7 +54,7 @@ class CustomPredictor:
         return predictions  # tf.Tensor
 
     def postprocess(self, predictions) -> Dict:
-        results = custom_postprocess(predictions, self._batch_info)
+        results = process.post(predictions, self._batch_info)
         logging.debug(f"results: {results}")
 
         return results  # output_api_schema
