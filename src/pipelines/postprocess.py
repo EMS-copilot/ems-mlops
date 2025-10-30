@@ -1,7 +1,7 @@
 from typing import Dict
 import tensorflow as tf
 
-from codes.batch_info import BatchInfo
+from pipelines.batch_info import BatchInfo
 
 
 def custom_postprocess(data: tf.Tensor, batch_info: BatchInfo) -> Dict:

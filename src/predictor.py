@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 import tensorflow as tf
 import struct2tensor.ops.gen_decode_proto_sparse
 
-from codes import (
+from pipelines import (
     BatchInfo,
     StaticResources, 
     get_static,

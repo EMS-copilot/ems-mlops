@@ -58,7 +58,7 @@ def to_tf_example(data: Dict):
 if __name__ == "__main__":
     import json
 
-    from codes.static_resources import load_hospital_meta, load_features
+    from pipelines.static_resources import load_hospital_meta, load_features
 
     with open("data/input_api_schema.json", "r") as f:
         data = json.load(f)
