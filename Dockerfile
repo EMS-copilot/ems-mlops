@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-COPY src/. .
+COPY src/. ./src/.
 
 ENV PYTHONUNBUFFERED=1
 
@@ -36,4 +36,4 @@ ENV AIP_FEATURE_FILE="${AIP_BUCKET_URI}/data/features.json"
 ENV AIP_META_FILE="${AIP_BUCKET_URI}/data/hospital_meta.csv"
 ENV AIP_CONSTRAINT_FILE="${AIP_BUCKET_URI}/data/constraints.json"
 
-CMD gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app --bind 0.0.0.0:${AIP_HTTP_PORT:-8080}
+CMD gunicorn -w 4 -k uvicorn.workers.UvicornWorker src.app:app --bind 0.0.0.0:${AIP_HTTP_PORT:-8080} --preload
