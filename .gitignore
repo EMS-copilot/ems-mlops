@@ -8,7 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# local env settings
 .envrc
 .bin/
 .bin
+local_model/
 white-sunspot-473307-p3*
