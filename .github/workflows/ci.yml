@@ -11,7 +11,7 @@ env:
 
 jobs:
   test-container-api:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -42,13 +42,21 @@ jobs:
 
       - name: Wait for API to start
         run: |
-          for i in {1..15}; do
-            if curl -s http://localhost:8080/health > /dev/null; then
-              echo "API ready"; break
+          CONTAINER_ID=$(docker ps -q --filter "ancestor=$IMAGE_URI")
+          echo "Waiting for container ($CONTAINER_ID) to start..."
+          for i in {1..30}; do
+            echo "[$i/30] Checking API health..."
+            if curl -fs http://localhost:8080/health > /dev/null; then
+              echo "API ready on attempt $i"
+              break
             fi
+            echo "Not ready yet. Showing container logs:"
+            docker logs --tail 10 $CONTAINER_ID || echo "No logs yet."
             sleep 2
           done
-
+          echo "Final container status:"
+          docker ps
+          
       - name: Run API tests
         run: pytest tests/test_api.py --host=http://localhost:8080
 
