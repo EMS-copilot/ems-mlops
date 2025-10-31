@@ -72,8 +72,7 @@ jobs:
             --machine-type=n1-standard-2 \
             --min-replica-count=1 \
             --max-replica-count=1 \
-            --service-account=$SERVICE_ACCOUNT \
-            --traffic-split=0
+            --service-account=$SERVICE_ACCOUNT
 
       - name: Get Deployed Model ID
         run: |
