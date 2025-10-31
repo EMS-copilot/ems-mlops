@@ -4,7 +4,8 @@ on:
   push:
     tags:
       - "v*"
-
+  workflow_dispatch:
+  
 env:
   # project meta
   PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
