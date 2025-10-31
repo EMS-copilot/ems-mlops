@@ -16,7 +16,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Write GCP service account key
-        run: echo "${{ secrets.GCP_SA_KEY }}" > $LOCAL_KEY_FILE
+        run: |
+          cat <<EOF > $LOCAL_KEY_FILE
+          ${{ secrets.GCP_SA_KEY }}
+          EOF
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -56,7 +59,7 @@ jobs:
           done
           echo "Final container status:"
           docker ps
-          
+
       - name: Run API tests
         run: pytest tests/test_api.py --host=http://localhost:8080
 
