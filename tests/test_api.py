@@ -6,6 +6,9 @@ def test_ping(host):
     resp = requests.get(f"{host}/ping")
     assert resp.status_code == 200, f"Ping failed at {host}: {resp.text}"
 
+def test_health(host):
+    resp = requests.get(f"{host}/health")
+    assert resp.status_code == 200, f"Ping failed at {host}: {resp.text}"
 
 @pytest.mark.parametrize(
     "input_file",

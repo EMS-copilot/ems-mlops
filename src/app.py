@@ -16,6 +16,8 @@ if os.getenv("LOCAL_ENV") == "true":
     MODEL_DIR = os.getenv("LOCAL_MODEL_DIR", ".")
     META_FILE = os.getenv("LOCAL_META_FILE", ".")
     FEATURE_FILE = os.getenv("LOCAL_FEATURE_FILE", ".")
+    CONSTRAINT_FILE = os.getenv("LOCAL_CONSTRAINT_FILE", ".")
+
 
 
 else:
@@ -24,6 +26,8 @@ else:
     MODEL_DIR = os.getenv("AIP_MODEL_DIR", ".")
     META_FILE = os.getenv("AIP_META_FILE", ".")
     FEATURE_FILE = os.getenv("AIP_FEATURE_FILE", ".")
+    CONSTRAINT_FILE = os.getenv("AIP_CONSTRAINT_FILE", ".")
+
 
 setup_logging()
 logging.info("App startup: Running in PRODUCTION mode: Using AIP model and meta directories.")
@@ -47,6 +51,20 @@ app = FastAPI(title="Custom TF Predictor with FastAPI", version="1.0", lifespan=
 @app.get("/ping", status_code=status.HTTP_200_OK)
 def ping():
     return {"status": "ready"}
+
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health(request: Request):
+    return {
+        "status": "ok", 
+        "model_status" : request.app.state.predictor._model is not None,
+        "model_key_status" : request.app.state.predictor._input_key is not None,
+        "model_dir": MODEL_DIR, 
+        "meta_file": META_FILE, 
+        "feature_file": FEATURE_FILE, 
+        "constraint_file": CONSTRAINT_FILE, 
+        "version": "0.1.3",
+        }
 
 
 @app.post("/predict")
