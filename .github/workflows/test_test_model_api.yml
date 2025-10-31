@@ -1,0 +1,37 @@
+name: CD Pipeline
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+env:
+  # project meta
+  PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
+  REGION: ${{ secrets.GCS_REGION }}
+  ENDPOINT_ID: ${{ secrets.VERTEX_ENDPOINT_ID }}
+  SERVICE_ACCOUNT: ${{ secrets.VERTEX_SERVICE_ACCOUNT }}
+  # model config
+  IMAGE_URI: ${{ secrets.GCS_IMAGE_URI }}
+  IMAGE_NAME: ${{ secrets.GCS_IMAGE_NAME}}
+  AIP_MODEL_DIR: ${{ secrets.AIP_MODEL_DIR }}
+
+jobs:
+  deploy-to-vertex:
+    runs-on: self-hosted
+    steps:
+      - name: Test Model API
+        run: |
+          source $GITHUB_ENV
+          echo "Promoting model $DEPLOYED_MODEL_ID to 100% traffic..."
+          
+          gcloud ai endpoints update $ENDPOINT_ID \
+            --project=$PROJECT_ID \
+            --region=$REGION \
+            --traffic-split=$DEPLOYED_MODEL_ID=100
+
+          gcloud ai endpoints predict $ENDPOINT_ID\
+            --project=$PROJECT_ID \
+            --region=$REGION \
+            --json-request=data/input_api_schema.json
