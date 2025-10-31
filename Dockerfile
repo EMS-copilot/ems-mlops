@@ -14,7 +14,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --group container --frozen --no-dev
+RUN uv sync --extra container --frozen --no-dev
 
 # ====================================================================
 # STAGE 2: runtime
