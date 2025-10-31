@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
-  
+
 env:
   # project meta
   PROJECT_ID: ${{ secrets.GCS_PROJECT_ID }}
@@ -14,10 +14,8 @@ env:
   SERVICE_ACCOUNT: ${{ secrets.VERTEX_SERVICE_ACCOUNT }}
   # model config
   IMAGE_URI: ${{ secrets.GCS_IMAGE_URI }}
-  MODEL_NAME: ${{ secrets.VERTEX_MODEL_NAME }}
   AIP_MODEL_DIR: ${{ secrets.AIP_MODEL_DIR }}
-  # key file
-  LOCAL_KEY_FILE: sa-key.json
+
 
 jobs:
   deploy-to-vertex:
@@ -25,12 +23,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Write GCP service account key
-        run: |
-          cat <<EOF > $LOCAL_KEY_FILE
-          ${{ secrets.GCS_SA_KEY }}
-          EOF
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
@@ -41,26 +33,27 @@ jobs:
 
       - name: Push Docker image to Artifact Registry
         run: |
+          echo "Build: $IMAGE_URI"
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
       - name: Upload model to Vertex AI
         run: |
           gcloud ai models upload \
-            --project=$PROJECT_ID \
-            --region=$REGION \
-            --display-name=$MODEL_NAME \
+            --project=${PROJECT_ID} \
+            --region=${REGION} \
+            --display-name=${IMAGE_URI} \
             --container-health-route="/health" \
             --container-predict-route="/predict" \
             --container-image-uri=$IMAGE_URI \
-            --artifact-uri=$AIP_MODEL_DIR
+            --artifact-uri=${AIP_MODEL_DIR}
 
       - name: Get latest model ID
         run: |
           MODEL_ID=$(gcloud ai models list \
             --project=$PROJECT_ID \
             --region=$REGION \
-            --filter="displayName=$MODEL_NAME" \
+            --filter="displayName=${IMAGE_URI}" \
             --sort-by=~createTime \
             --format="value(name)" | head -n 1)
           echo "MODEL_ID=$MODEL_ID" >> $GITHUB_ENV
@@ -75,7 +68,7 @@ jobs:
             --project=$PROJECT_ID \
             --region=$REGION \
             --model=$MODEL_ID \
-            --display-name=${MODEL_NAME}-deployed \
+            --display-name=${IMAGE_URI}-deployed \
             --machine-type=n1-standard-2 \
             --min-replica-count=1 \
             --max-replica-count=1 \
