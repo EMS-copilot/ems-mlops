@@ -1,4 +1,4 @@
-name: CD Pipeline - Test Model API
+name: CD Test Model API
 
 on:
   push:
@@ -17,6 +17,7 @@ env:
   IMAGE_NAME: ${{ secrets.GCS_IMAGE_NAME}}
   AIP_MODEL_DIR: ${{ secrets.AIP_MODEL_DIR }}
   DEPLOYED_MODEL_ID: ${{ secrest.TEST_MODEL_ID}}
+
 jobs:
   deploy-to-vertex:
     runs-on: self-hosted
