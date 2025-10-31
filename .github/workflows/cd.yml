@@ -102,7 +102,6 @@ jobs:
           gcloud ai endpoints predict $ENDPOINT_ID\
             --project=$PROJECT_ID \
             --region=$REGION \
-            --deployed-model-id=$DEPLOYED_MODEL_ID \
             --json-request=data/input_api_schema.json
 
 
