@@ -93,8 +93,8 @@ jobs:
         run: |
           source $GITHUB_ENV
           echo "Promoting model $DEPLOYED_MODEL_ID to 100% traffic..."
-          gcloud ai endpoints update-traffic-split \
-            $ENDPOINT_ID \
+          
+          gcloud ai endpoints update $ENDPOINT_ID \
             --project=$PROJECT_ID \
             --region=$REGION \
             --traffic-split=$DEPLOYED_MODEL_ID=100
@@ -105,16 +105,6 @@ jobs:
             --deployed-model-id=$DEPLOYED_MODEL_ID \
             --json-request=data/input_api_schema.json
 
-      - name: Promote new model to production (100% traffic)
-        if: success()
-        run: |
-          source $GITHUB_ENV
-          echo "Promoting model $DEPLOYED_MODEL_ID to 100% traffic..."
-          gcloud ai endpoints update-traffic-split \
-            $ENDPOINT_ID \
-            --project=$PROJECT_ID \
-            --region=$REGION \
-            --traffic-split=$DEPLOYED_MODEL_ID=100
 
       - name: Rollback traffic and clean up on failure
         if: failure()
@@ -128,11 +118,11 @@ jobs:
             --format="value(deployedModels[0].id)")
           if [ -n "$PREV_ID" ]; then
             echo "Rolling back traffic to previous model: $PREV_ID"
-            gcloud ai endpoints update-traffic-split \
-              $ENDPOINT_ID \
-              --project=$PROJECT_ID \
-              --region=$REGION \
-              --traffic-split=$PREV_ID=100
+          
+          gcloud ai endpoints update $ENDPOINT_ID \
+            --project=$PROJECT_ID \
+            --region=$REGION \
+            --traffic-split=$DEPLOYED_MODEL_ID=0
           else
             echo "No previous model found — rollback skipped."
           fi
